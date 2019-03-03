@@ -96,10 +96,10 @@
 		return count
 	}
 
-	function run (numerals, startString, fudge, prefix, out) {
+	function run (numerals, startString, fudge, prefix, output) {
 		const letters = getLetters(numerals)
-		out('letters:')
-		out(letters.join(' '))
+		output('log', 'letters:')
+		output('log', letters.join(' '))
 
 		const signatures = getSignatures(letters, numerals)
 		const indexMax = letters.length
@@ -110,11 +110,11 @@
 		const countLetters = getCountLetters(letters, inflated)
 
 		if (startString.trim().length > 0) {
-			out('inflated:')
-			out(inflated)
+			output('log', 'inflated:')
+			output('log', inflated)
 
-			out('starting from:')
-			out(countLetters.join(' '))
+			output('log', 'starting from:')
+			output('log', countLetters.join(' '))
 		}
 
 		const solution = new Uint8Array(letters.length)
@@ -141,7 +141,7 @@
 
 					// validate partial
 					let partial = true
-					for (let j = 0; j < index; j++) {
+					for (let j = 0; j <= index; j++) {
 						if (sum[j] > solution[j]) {
 							partial = false
 							break
@@ -179,9 +179,8 @@
 						}
 					}
 
-					if (valid) {
-						out('solution:')
-						out(solution.join(' '))
+					if (valid && solution.some(Boolean)) {
+						output('solution', solution.join(' '))
 					}
 				}
 			}

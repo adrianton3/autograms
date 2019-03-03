@@ -95,28 +95,67 @@
 		const intro = document.getElementById('intro').value
 		const lastSeparator = document.getElementById('last-separator').value
 
-		const output = (string) => {
-			document.getElementById('out').value += `\n${string}`
+		
+		const parameters = {
+			language,
+			intro,
+			lastSeparator,
+			fudge,
+			prefix,
 		}
 
-		setTimeout(() => {
-			const startTime = performance.now()
+		const key = JSON.stringify(parameters)
 
-			auto.runner.run(
-				auto.languages[language].numerals,
-				`${intro} ${lastSeparator}`,
-				fudge,
-				prefix,
-				output,
-			)
+		const cache = (() => {
+			const cacheString = localStorage.getItem('autograms-cache')
+			if (cacheString == null) {
+				localStorage.setItem('autograms-cache', JSON.stringify({}))
+				return {}
+			} else {
+				return JSON.parse(cacheString)
+			}
+		})()
 
-			const endTime = performance.now()
-			output(`time: ${endTime - startTime}`)
-		}, 4)
+		function output (type, data) {
+			const outElement = document.getElementById('out')
+
+			if (type === 'log') {
+				outElement.value += `\n${data}`
+			} else if (type === 'solution') {
+				if (!cache[key].includes(data)) {
+					cache[key].push(data)
+				}
+
+				localStorage.setItem('autograms-cache', JSON.stringify(cache))
+
+				outElement.value += `\nsolution:\n${data}`
+			} else if (type === 'cache') {
+				outElement.value += `\ncached solutions:\n${data.join('\n')}`
+			}
+		}
+
+		if (cache.hasOwnProperty(key)) {
+			output('cache', cache[key])
+		} else {
+			setTimeout(() => {
+				if (!cache.hasOwnProperty(key)) {
+					cache[key] = []
+					localStorage.setItem('autograms-cache', JSON.stringify(cache))
+				}
+
+				const startTime = performance.now()
+
+				auto.runner.run(
+					auto.languages[language].numerals,
+					`${intro} ${lastSeparator}`,
+					fudge,
+					prefix,
+					output,
+				)
+
+				const endTime = performance.now()
+				output('log', `time: ${endTime - startTime}`)
+			}, 4)
+		}
 	})
-
-	// console.time()
-	// auto.runner.run(auto.languages['italian'], 'Questa frase contiene e', 10, [5])
-	// auto.runner.run(auto.languages['italian'], 'Questa frase contiene e', 20, [5, 8, 8, 12, 14])
-	// console.timeEnd()
 })()
