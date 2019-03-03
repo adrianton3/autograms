@@ -1,8 +1,19 @@
 (() => {
 	'use strict'
 
+	const languageElement = document.getElementById('language')
+
+	Object.keys(auto.languages).forEach((language) => {
+		const option = document.createElement('option')
+		option.textContent = language
+
+		languageElement.appendChild(option)
+	})
+
 	document.getElementById('run').addEventListener('click', () => {
 		document.getElementById('out').value = 'searching'
+
+		const language = document.getElementById('language').value
 
 		const prefix = (() => {
 			const first = Number(document.getElementById('first').value)
@@ -32,7 +43,7 @@
 			const startTime = performance.now()
 
 			auto.runner.run(
-				auto.languages['italian'],
+				auto.languages[language],
 				`${intro} ${lastSeparator}`,
 				fudge,
 				prefix,
