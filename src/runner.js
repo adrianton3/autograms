@@ -109,11 +109,13 @@
 		const inflated = inflateNonLetters(numerals, countNonLetters, startString)
 		const countLetters = getCountLetters(letters, inflated)
 
-		out('inflated:')
-		out(inflated)
+		if (startString.trim().length > 0) {
+			out('inflated:')
+			out(inflated)
 
-		out('starting from:')
-		out(countLetters.join(' '))
+			out('starting from:')
+			out(countLetters.join(' '))
+		}
 
 		const solution = new Uint8Array(letters.length)
 		const sum = countLetters.slice()
