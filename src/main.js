@@ -10,7 +10,7 @@
 		languageElement.appendChild(option)
 	})
 
-	function populateIntros () {
+	function updateIntros () {
 		const introsElement = document.getElementById('intros')
 
 		while (introsElement.firstChild != null) {
@@ -27,10 +27,10 @@
 		})
 	}
 
-	populateIntros()
-	languageElement.addEventListener('change', populateIntros)
+	updateIntros()
+	languageElement.addEventListener('change', updateIntros)
 
-	function populateLastSeparators () {
+	function updateLastSeparators () {
 		const lastSeparatorsElement = document.getElementById('last-separators')
 
 		while (lastSeparatorsElement.firstChild != null) {
@@ -47,8 +47,20 @@
 		})
 	}
 
-	populateLastSeparators()
-	languageElement.addEventListener('change', populateLastSeparators)
+	updateLastSeparators()
+	languageElement.addEventListener('change', updateLastSeparators)
+
+	function updateLetters () {
+		const language = languageElement.value
+
+		const letters = auto.runner.getLetters(auto.languages[language].numerals)
+
+		document.getElementById('first-letter').textContent = letters[0]
+		document.getElementById('second-letter').textContent = letters[1]
+	}
+
+	updateLetters()
+	languageElement.addEventListener('change', updateLetters)
 
 	document.getElementById('run').addEventListener('click', () => {
 		document.getElementById('out').value = 'searching'
