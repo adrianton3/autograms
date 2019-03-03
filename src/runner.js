@@ -41,11 +41,11 @@
 		return numerals.map((numeral) => getSignature(letters, numeral))
 	}
 
-	function getCountMax (letters, numbers) {
+	function getCountMax (letters, signatures) {
 		const max = new Uint8Array(letters.length)
 
-		numbers.forEach((number) => {
-			number.forEach((value, index) => {
+		signatures.forEach((signature) => {
+			signature.forEach((value, index) => {
 				max[index] = Math.max(max[index], value)
 			})
 		})
@@ -216,5 +216,7 @@
 	Object.assign(auto.runner, {
 		run,
 		getLetters,
+		getSignatures,
+		getCountMax,
 	})
 })()

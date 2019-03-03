@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Autograms</title>
     <style>
+        body {
+            font-family: sans-serif;
+        }
+
         div {
             padding: 2px;
         }
@@ -20,6 +24,13 @@
         #last-separator {
             width: 60px;
         }
+
+        #first-letter,#second-letter {
+            font-family: monospace;
+            background-color: hsl(0, 0%, 92%);
+            padding-left: 2px;
+            padding-right: 2px;
+        }
     </style>
 </head>
 <body>
@@ -31,8 +42,9 @@
     </div>
 
     <div>
-        <label for="first">First</label> <input id="first" type="number" value="-1" min="-1" max="30">
-        <label for="second">Second</label> <input id="second" type="number" value="-1" min="-1" max="30">
+        Lock
+        <label for="first"><span id="first-letter"></span>'s</label> <input id="first" type="number" value="-1" min="-1" max="30">
+        <label for="second"><span id="second-letter"></span>'s</label> <input id="second" type="number" value="-1" min="-1" max="30">
     </div>
 
     <div>
