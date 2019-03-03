@@ -28,13 +28,20 @@
 			document.getElementById('out').value += `\n${string}`
 		}
 
-		auto.runner.run(
-			auto.languages['italian'],
-			`${intro} ${lastSeparator}`,
-			fudge,
-			prefix,
-			output,
-		)
+		setTimeout(() => {
+			const startTime = performance.now()
+
+			auto.runner.run(
+				auto.languages['italian'],
+				`${intro} ${lastSeparator}`,
+				fudge,
+				prefix,
+				output,
+			)
+
+			const endTime = performance.now()
+			output(`time: ${endTime - startTime}`)
+		}, 4)
 	})
 
 	// console.time()
