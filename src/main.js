@@ -53,10 +53,18 @@
 	function updateLetters () {
 		const language = languageElement.value
 
-		const letters = auto.runner.getLetters(auto.languages[language].numerals)
+		const numerals = auto.languages[language].numerals
+		const letters = auto.runner.getLetters(numerals)
+		const signatures = auto.runner.getSignatures(letters, numerals)
+		const countMax = auto.runner.getCountMax(letters, signatures)
 
-		document.getElementById('first-letter').textContent = letters[0]
-		document.getElementById('second-letter').textContent = letters[1]
+		const firstLetterElement = document.getElementById('first-letter')
+		firstLetterElement.textContent = letters[0]
+		firstLetterElement.title = `Count max: ${countMax[0]}`
+
+		const secondLetterElement = document.getElementById('second-letter')
+		secondLetterElement.textContent = letters[1]
+		secondLetterElement.title = `Count max: ${countMax[1]}`
 	}
 
 	updateLetters()
