@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Autograms</title>
+    <style>
+        div {
+            padding: 2px;
+        }
+
+        #out {
+            height: 250px;
+            width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        First <input id="first" type="number" value="0" min="-1" max="30">
+        Second <input id="second" type="number" value="0" min="-1" max="30">
+    </div>
+
+    <div>Fudge <input id="fudge" type="number" value="5" min="2" max="30"></div>
+
+    <div>
+        Intro <input id="intro" type="text">
+        Last separator <input id="last-separator" type="text">
+    </div>
+
+    <div><button id="run">Run</button></div>
+
+    <div><textarea id="out"></textarea></div>
+
+    <script>window.auto = {}</script>
+
+    <script src="languages/italian.js"></script>
+
+    <script src="src/runner.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
