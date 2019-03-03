@@ -141,7 +141,7 @@
 
 					// validate partial
 					let partial = true
-					for (let j = 0; j < index; j++) {
+					for (let j = 0; j <= index; j++) {
 						if (sum[j] > solution[j]) {
 							partial = false
 							break
