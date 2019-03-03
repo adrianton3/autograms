@@ -12,9 +12,20 @@
             height: 250px;
             width: 500px;
         }
+
+        #intro {
+            width: 200px;
+        }
+
+        #last-separator {
+            width: 60px;
+        }
     </style>
 </head>
 <body>
+    <datalist id="intros"></datalist>
+    <datalist id="last-separators"></datalist>
+
     <div>
         <label for="language">Language</label> <select id="language"></select>
     </div>
@@ -29,8 +40,8 @@
     </div>
 
     <div>
-        <label for="intro">Intro</label> <input id="intro" type="text">
-        <label for="last-separator">Last separator</label> <input id="last-separator" type="text">
+        <label for="intro">Intro</label> <input id="intro" type="text" list="intros">
+        <label for="last-separator">Last separator</label> <input id="last-separator" type="text" list="last-separators">
     </div>
 
     <div><button id="run">Run</button></div>

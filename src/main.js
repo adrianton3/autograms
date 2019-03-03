@@ -10,10 +10,50 @@
 		languageElement.appendChild(option)
 	})
 
+	function populateIntros () {
+		const introsElement = document.getElementById('intros')
+
+		while (introsElement.firstChild != null) {
+			introsElement.removeChild(introsElement.firstChild)
+		}
+
+		const language = languageElement.value
+
+		auto.languages[language].intros.forEach((intro) => {
+			const option = document.createElement('option')
+			option.textContent = intro
+
+			introsElement.appendChild(option)
+		})
+	}
+
+	populateIntros()
+	languageElement.addEventListener('change', populateIntros)
+
+	function populateLastSeparators () {
+		const lastSeparatorsElement = document.getElementById('last-separators')
+
+		while (lastSeparatorsElement.firstChild != null) {
+			lastSeparatorsElement.removeChild(lastSeparatorsElement.firstChild)
+		}
+
+		const language = languageElement.value
+
+		auto.languages[language].lastSeparators.forEach((intro) => {
+			const option = document.createElement('option')
+			option.textContent = intro
+
+			lastSeparatorsElement.appendChild(option)
+		})
+	}
+
+	populateLastSeparators()
+	languageElement.addEventListener('change', populateLastSeparators)
+
 	document.getElementById('run').addEventListener('click', () => {
 		document.getElementById('out').value = 'searching'
 
-		const language = document.getElementById('language').value
+		const language = languageElement.value
 
 		const prefix = (() => {
 			const first = Number(document.getElementById('first').value)
@@ -43,7 +83,7 @@
 			const startTime = performance.now()
 
 			auto.runner.run(
-				auto.languages[language],
+				auto.languages[language].numerals,
 				`${intro} ${lastSeparator}`,
 				fudge,
 				prefix,
