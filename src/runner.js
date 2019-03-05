@@ -157,7 +157,10 @@
 			if (index < indexMax - 1) {
 				// find min from partial
 				const min = sum[index]
-				const max = min + Math.min(fudge, (indexMax - index) * countMax[index])
+				const max = min + Math.min(
+					fudge,
+					(indexMax - index) * countMax[index] + 1 /* self @ */
+				)
 
 				for (let i = min; i <= max; i++) {
 					// apply partial
@@ -198,7 +201,7 @@
 				}
 			} else {
 				const min = sum[index]
-				const max = min + countMax[index]
+				const max = min + countMax[index] + 1 /* self @ */
 
 				for (let i = min; i <= max; i++) {
 					solution[index] = i
