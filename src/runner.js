@@ -28,6 +28,36 @@
 		return keys
 	}
 
+	function getLettersSorted (numerals) {
+		const max = new Map
+
+		numerals.forEach((numeral) => {
+			const map = new Map
+
+			;[...numeral.toLowerCase()].forEach((char) => {
+				if (isLetter(char)) {
+					if (map.has(char)) {
+						map.set(char, map.get(char) + 1)
+					} else {
+						map.set(char, 1)
+					}
+				}
+			})
+
+			map.forEach((value, char) => {
+				if (max.has(char)) {
+					max.set(char, Math.max(max.get(char), value))
+				} else {
+					max.set(char, value)
+				}
+			})
+		})
+
+		const entries = [...max]
+		entries.sort((a, b) => a[1] - b[1])
+		return entries.map((entry) => entry[0])
+	}
+
 	function getSignature (letters, numeral) {
 		return letters.map((letter) => {
 			const regex = new RegExp(letter, 'g')
@@ -97,13 +127,16 @@
 	}
 
 	function run (numerals, startString, fudge, prefix, output) {
-		const letters = getLetters(numerals)
+		const letters = getLettersSorted(numerals)
 		output('log', 'letters:')
 		output('log', letters.join(' '))
 
 		const signatures = getSignatures(letters, numerals)
 		const indexMax = letters.length
 		const countMax = getCountMax(letters, signatures)
+
+		output('log', 'count max:')
+		output('log', countMax)
 
 		const countNonLetters = getCountNonLetters(letters, startString)
 		const inflated = inflateNonLetters(numerals, countNonLetters, startString)
@@ -211,10 +244,12 @@
 		}
 	}
 
+
+
 	auto.runner = auto.runner || {}
 	Object.assign(auto.runner, {
 		run,
-		getLetters,
+		getLetters: getLettersSorted,
 		getSignatures,
 		getCountMax,
 	})
