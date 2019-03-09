@@ -95,15 +95,7 @@
 		}
 	}
 
-	const worker = new Worker('src/worker.js')
-
-	worker.addEventListener('message', ({ data }) => {
-		output(data.type, data.data)
-	})
-
-	document.getElementById('run').addEventListener('click', () => {
-		document.getElementById('out').value = 'searching'
-
+	function getParameters () {
 		const language = languageElement.value
 
 		const prefix = (() => {
@@ -126,14 +118,25 @@
 		const intro = document.getElementById('intro').value
 		const lastSeparator = document.getElementById('last-separator').value
 
-		
-		const parameters = {
+		return {
 			language,
 			intro,
 			lastSeparator,
 			fudge,
 			prefix,
 		}
+	}
+
+	const worker = new Worker('src/worker.js')
+
+	worker.addEventListener('message', ({ data }) => {
+		output(data.type, data.data)
+	})
+
+	document.getElementById('run').addEventListener('click', () => {
+		document.getElementById('out').value = 'searching'
+
+		const parameters = getParameters()
 
 		// const key = JSON.stringify(parameters)
 
