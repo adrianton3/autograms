@@ -83,6 +83,13 @@
 			// localStorage.setItem('autograms-cache', JSON.stringify(cache))
 
 			outElement.value += `\nsolution:\n${data}`
+		} else if (type === 'time') {
+			const value = data >= 1000 * 60 * 60 ? `${(data / (1000 * 60 * 60)).toFixed(1)} h`
+				: data >= 1000 * 60 ? `${(data / (1000 * 60)).toFixed(1)} m`
+				: data >= 1000 ? `${(data / 1000).toFixed(1)} s`
+				: `${data} ms`
+
+			outElement.value += `\ntime: ${value}`
 		} else if (type === 'cache') {
 			outElement.value += `\ncached solutions:\n${data.join('\n')}`
 		}

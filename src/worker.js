@@ -27,7 +27,8 @@
 			)
 
 			const endTime = performance.now()
-			postMessage({ type: 'log', data: `time: ${endTime - startTime}` })
+
+			postMessage({ type: 'time', data: endTime - startTime })
 		}
 	})
 })()
