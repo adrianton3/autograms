@@ -127,7 +127,7 @@
 	}
 
 	function run (numerals, startString, fudge, prefix, output) {
-		const letters = getLettersSorted(numerals)
+		const letters = getLetters(numerals)
 		output('log', 'letters:')
 		output('log', letters.join(' '))
 
@@ -252,7 +252,7 @@
 	auto.runner = auto.runner || {}
 	Object.assign(auto.runner, {
 		run,
-		getLetters: getLettersSorted,
+		getLetters,//: getLettersSorted,
 		getSignatures,
 		getCountMax,
 	})

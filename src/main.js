@@ -70,6 +70,30 @@
 	updateLetters()
 	languageElement.addEventListener('change', updateLetters)
 
+	function output (type, data) {
+		const outElement = document.getElementById('out')
+
+		if (type === 'log') {
+			outElement.value += `\n${data}`
+		} else if (type === 'solution') {
+			// if (!cache[key].includes(data)) {
+			// 	cache[key].push(data)
+			// }
+
+			// localStorage.setItem('autograms-cache', JSON.stringify(cache))
+
+			outElement.value += `\nsolution:\n${data}`
+		} else if (type === 'cache') {
+			outElement.value += `\ncached solutions:\n${data.join('\n')}`
+		}
+	}
+
+	const worker = new Worker('src/worker.js')
+
+	worker.addEventListener('message', ({ data }) => {
+		output(data.type, data.data)
+	})
+
 	document.getElementById('run').addEventListener('click', () => {
 		document.getElementById('out').value = 'searching'
 
@@ -104,58 +128,29 @@
 			prefix,
 		}
 
-		const key = JSON.stringify(parameters)
+		// const key = JSON.stringify(parameters)
 
-		const cache = (() => {
-			const cacheString = localStorage.getItem('autograms-cache')
-			if (cacheString == null) {
-				localStorage.setItem('autograms-cache', JSON.stringify({}))
-				return {}
-			} else {
-				return JSON.parse(cacheString)
-			}
-		})()
+		// const cache = (() => {
+		// 	const cacheString = localStorage.getItem('autograms-cache')
+		// 	if (cacheString == null) {
+		// 		localStorage.setItem('autograms-cache', JSON.stringify({}))
+		// 		return {}
+		// 	} else {
+		// 		return JSON.parse(cacheString)
+		// 	}
+		// })()
 
-		function output (type, data) {
-			const outElement = document.getElementById('out')
+		// if (cache.hasOwnProperty(key)) {
+		// 	output('cache', cache[key])
+		// } else {
 
-			if (type === 'log') {
-				outElement.value += `\n${data}`
-			} else if (type === 'solution') {
-				if (!cache[key].includes(data)) {
-					cache[key].push(data)
-				}
+				// if (!cache.hasOwnProperty(key)) {
+				// 	cache[key] = []
+				// 	localStorage.setItem('autograms-cache', JSON.stringify(cache))
+				// }
 
-				localStorage.setItem('autograms-cache', JSON.stringify(cache))
+				worker.postMessage({ type: 'solve', parameters })
 
-				outElement.value += `\nsolution:\n${data}`
-			} else if (type === 'cache') {
-				outElement.value += `\ncached solutions:\n${data.join('\n')}`
-			}
-		}
-
-		if (cache.hasOwnProperty(key)) {
-			output('cache', cache[key])
-		} else {
-			setTimeout(() => {
-				if (!cache.hasOwnProperty(key)) {
-					cache[key] = []
-					localStorage.setItem('autograms-cache', JSON.stringify(cache))
-				}
-
-				const startTime = performance.now()
-
-				auto.runner.run(
-					auto.languages[language].numerals,
-					`${intro} ${lastSeparator}`,
-					fudge,
-					prefix,
-					output,
-				)
-
-				const endTime = performance.now()
-				output('log', `time: ${endTime - startTime}`)
-			}, 4)
-		}
+		// }
 	})
 })()
