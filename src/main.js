@@ -113,7 +113,7 @@
 			return [first, second]
 		})()
 
-		const fudge = Number(document.getElementById('fudge').value)
+		const fudgeStart = Number(document.getElementById('fudge-start').value)
 
 		const intro = document.getElementById('intro').value
 		const lastSeparator = document.getElementById('last-separator').value
@@ -122,7 +122,7 @@
 			language,
 			intro,
 			lastSeparator,
-			fudge,
+			fudge: fudgeStart,
 			prefix,
 		}
 	}
@@ -131,12 +131,11 @@
 
 	let parameters
 	let fudgeExtra
+	let fudgeTimeMin
 
 	worker.addEventListener('message', ({ data }) => {
 		if (data.type === 'time') {
-			const timeLimit = 1000 * 30
-
-			if (data.data < timeLimit) {
+			if (data.data < fudgeTimeMin) {
 				fudgeExtra++
 				output('log', `increase fudge to ${parameters.fudge + fudgeExtra}`)
 
@@ -160,6 +159,7 @@
 
 		parameters = getParameters()
 		fudgeExtra = 0
+		fudgeTimeMin = Number(document.getElementById('fudge-time-min').value) * 1000
 
 		// const key = JSON.stringify(parameters)
 
