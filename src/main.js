@@ -129,14 +129,37 @@
 
 	const worker = new Worker('src/worker.js')
 
+	let parameters
+	let fudgeExtra
+
 	worker.addEventListener('message', ({ data }) => {
+		if (data.type === 'time') {
+			const timeLimit = 1000 * 30
+
+			if (data.data < timeLimit) {
+				fudgeExtra++
+				output('log', `increase fudge to ${parameters.fudge + fudgeExtra}`)
+
+				setTimeout(() => {
+					worker.postMessage({
+						type: 'solve',
+						parameters: {
+							...parameters,
+							fudge: parameters.fudge + fudgeExtra,
+						},
+					})
+				}, 1000)
+			}
+		}
+
 		output(data.type, data.data)
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
 		document.getElementById('out').value = 'searching'
 
-		const parameters = getParameters()
+		parameters = getParameters()
+		fudgeExtra = 0
 
 		// const key = JSON.stringify(parameters)
 
