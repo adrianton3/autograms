@@ -134,6 +134,7 @@
 		const signatures = getSignatures(letters, numerals)
 		const indexMax = letters.length
 		const countMax = getCountMax(letters, signatures)
+		const maxMax = numerals.length - 1
 
 		output('log', 'count max:')
 		output('log', countMax)
@@ -157,9 +158,9 @@
 			if (index < indexMax - 1) {
 				// find min from partial
 				const min = sum[index]
-				const max = min + Math.min(
-					fudge,
-					(indexMax - index) * countMax[index] + 1 /* self @ */
+				const max = Math.min(
+					min + Math.min(fudge, (indexMax - index) * countMax[index] + 1 /* self @ */),
+					maxMax,
 				)
 
 				for (let i = min; i <= max; i++) {
@@ -201,7 +202,10 @@
 				}
 			} else {
 				const min = sum[index]
-				const max = min + countMax[index] + 1 /* self @ */
+				const max = Math.min(
+					min + countMax[index] + 1 /* self @ */,
+					maxMax,
+				)
 
 				for (let i = min; i <= max; i++) {
 					solution[index] = i
