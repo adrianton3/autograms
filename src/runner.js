@@ -127,13 +127,14 @@
 	}
 
 	function run (numerals, startString, fudge, prefix, output) {
-		const letters = getLettersSorted(numerals)
+		const letters = getLetters(numerals)
 		output('log', 'letters:')
 		output('log', letters.join(' '))
 
 		const signatures = getSignatures(letters, numerals)
 		const indexMax = letters.length
 		const countMax = getCountMax(letters, signatures)
+		const maxMax = numerals.length - 1
 
 		output('log', 'count max:')
 		output('log', countMax)
@@ -157,9 +158,9 @@
 			if (index < indexMax - 1) {
 				// find min from partial
 				const min = sum[index]
-				const max = min + Math.min(
-					fudge,
-					(indexMax - index) * countMax[index] + 1 /* self @ */
+				const max = Math.min(
+					min + Math.min(fudge, (indexMax - index) * countMax[index] + 1 /* self @ */),
+					maxMax,
 				)
 
 				for (let i = min; i <= max; i++) {
@@ -201,7 +202,10 @@
 				}
 			} else {
 				const min = sum[index]
-				const max = min + countMax[index] + 1 /* self @ */
+				const max = Math.min(
+					min + countMax[index] + 1 /* self @ */,
+					maxMax,
+				)
 
 				for (let i = min; i <= max; i++) {
 					solution[index] = i
@@ -214,87 +218,6 @@
 							break
 						}
 					}
-
-					if (valid && solution.some(Boolean)) {
-						output('solution', solution.join(' '))
-					}
-				}
-			}
-		}
-
-		function btCustom (index) {
-			if (index < indexMax - 1) {
-				// find min from partial
-				const min = sum[index]
-				const max = min + Math.min(
-					fudge,
-					(indexMax - index) * countMax[index] + 1 /* self @ */
-				)
-
-				for (let i = min; i <= max; i++) {
-					// apply partial
-					solution[index] = i
-					const signature = signatures[i]
-					for (let j = 0; j < indexMax; j++) {
-						sum[j] += signature[j]
-					}
-
-					// apply itself
-					if (i > 0) {
-						sum[index]++
-					}
-
-					// validate partial
-					let partial = true
-					for (let j = 0; j <= index; j++) {
-						if (sum[j] > solution[j]) {
-							partial = false
-							break
-						}
-					}
-
-					if (partial) {
-						// recurse
-						btCustom(index + 1)
-					}
-
-					// remove partial
-					for (let j = 0; j < indexMax; j++) {
-						sum[j] -= signature[j]
-					}
-
-					// remove itself
-					if (i > 0) {
-						sum[index]--
-					}
-				}
-			} else {
-				const min = sum[index]
-				const max = min + countMax[index] + 1 /* self @ */
-
-				for (let i = min; i <= max; i++) {
-					solution[index] = i
-					const signature = signatures[i]
-
-					const self = i > 0 ? 1 : 0
-
-					const delta0 = sum[0] + signature[0] + self - solution[0]
-					const delta12 = sum[12] + signature[12] + self - solution[12]
-
-					const valid = delta0 === delta12 &&
-						sum[1] + signature[1] + self === solution[1] &&
-						sum[2] + signature[2] + self === solution[2] &&
-						sum[3] + signature[3] + self === solution[3] &&
-						sum[4] + signature[4] + self === solution[4] &&
-						sum[5] + signature[5] + self === solution[5] &&
-						sum[6] + signature[6] + self === solution[6] &&
-						sum[7] + signature[7] + self === solution[7] &&
-						sum[8] + signature[8] + self === solution[8] &&
-						sum[9] + signature[9] + self === solution[9] &&
-						sum[10] + signature[10] + self === solution[10] &&
-						sum[11] + signature[11] + self === solution[11] &&
-						sum[13] + signature[13] + self === solution[13] &&
-						sum[14] + signature[14] + self === solution[14]
 
 					if (valid && solution.some(Boolean)) {
 						output('solution', solution.join(' '))
@@ -318,21 +241,13 @@
 				}
 			}
 
-			if (numerals[1] === 'un @') {
-				btCustom(prefix.length)
-			} else {
-				bt(prefix.length)
-			}
+			bt(prefix.length)
 		}
 
 		if (prefix != null) {
 			setPrefix(prefix)
 		} else {
-			if (numerals[1] === 'un @') {
-				btCustom(0)
-			} else {
-				bt(0)
-			}
+			bt(0)
 		}
 	}
 
@@ -341,7 +256,7 @@
 	auto.runner = auto.runner || {}
 	Object.assign(auto.runner, {
 		run,
-		getLetters: getLettersSorted,
+		getLetters,//: getLettersSorted,
 		getSignatures,
 		getCountMax,
 	})

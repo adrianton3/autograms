@@ -70,9 +70,32 @@
 	updateLetters()
 	languageElement.addEventListener('change', updateLetters)
 
-	document.getElementById('run').addEventListener('click', () => {
-		document.getElementById('out').value = 'searching'
+	function output (type, data) {
+		const outElement = document.getElementById('out')
 
+		if (type === 'log') {
+			outElement.value += `\n${data}`
+		} else if (type === 'solution') {
+			// if (!cache[key].includes(data)) {
+			// 	cache[key].push(data)
+			// }
+
+			// localStorage.setItem('autograms-cache', JSON.stringify(cache))
+
+			outElement.value += `\nsolution:\n${data}`
+		} else if (type === 'time') {
+			const value = data >= 1000 * 60 * 60 ? `${(data / (1000 * 60 * 60)).toFixed(1)} h`
+				: data >= 1000 * 60 ? `${(data / (1000 * 60)).toFixed(1)} m`
+				: data >= 1000 ? `${(data / 1000).toFixed(1)} s`
+				: `${data} ms`
+
+			outElement.value += `\ntime: ${value}`
+		} else if (type === 'cache') {
+			outElement.value += `\ncached solutions:\n${data.join('\n')}`
+		}
+	}
+
+	function getParameters () {
 		const language = languageElement.value
 
 		const prefix = (() => {
@@ -90,72 +113,77 @@
 			return [first, second]
 		})()
 
-		const fudge = Number(document.getElementById('fudge').value)
+		const fudgeStart = Number(document.getElementById('fudge-start').value)
 
 		const intro = document.getElementById('intro').value
 		const lastSeparator = document.getElementById('last-separator').value
 
-		
-		const parameters = {
+		return {
 			language,
 			intro,
 			lastSeparator,
-			fudge,
+			fudge: fudgeStart,
 			prefix,
 		}
+	}
 
-		const key = JSON.stringify(parameters)
+	const worker = new Worker('src/worker.js')
 
-		const cache = (() => {
-			const cacheString = localStorage.getItem('autograms-cache')
-			if (cacheString == null) {
-				localStorage.setItem('autograms-cache', JSON.stringify({}))
-				return {}
-			} else {
-				return JSON.parse(cacheString)
-			}
-		})()
+	let parameters
+	let fudgeExtra
+	let fudgeTimeMin
 
-		function output (type, data) {
-			const outElement = document.getElementById('out')
+	worker.addEventListener('message', ({ data }) => {
+		if (data.type === 'time') {
+			if (data.data < fudgeTimeMin) {
+				fudgeExtra++
+				output('log', `increase fudge to ${parameters.fudge + fudgeExtra}`)
 
-			if (type === 'log') {
-				outElement.value += `\n${data}`
-			} else if (type === 'solution') {
-				if (!cache[key].includes(data)) {
-					cache[key].push(data)
-				}
-
-				localStorage.setItem('autograms-cache', JSON.stringify(cache))
-
-				outElement.value += `\nsolution:\n${data}`
-			} else if (type === 'cache') {
-				outElement.value += `\ncached solutions:\n${data.join('\n')}`
+				setTimeout(() => {
+					worker.postMessage({
+						type: 'solve',
+						parameters: {
+							...parameters,
+							fudge: parameters.fudge + fudgeExtra,
+						},
+					})
+				}, 1000)
 			}
 		}
 
-		if (cache.hasOwnProperty(key)) {
-			output('cache', cache[key])
-		} else {
-			setTimeout(() => {
-				if (!cache.hasOwnProperty(key)) {
-					cache[key] = []
-					localStorage.setItem('autograms-cache', JSON.stringify(cache))
-				}
+		output(data.type, data.data)
+	})
 
-				const startTime = performance.now()
+	document.getElementById('run').addEventListener('click', () => {
+		document.getElementById('out').value = 'searching'
 
-				auto.runner.run(
-					auto.languages[language].numerals,
-					`${intro} ${lastSeparator}`,
-					fudge,
-					prefix,
-					output,
-				)
+		parameters = getParameters()
+		fudgeExtra = 0
+		fudgeTimeMin = Number(document.getElementById('fudge-time-min').value) * 1000
 
-				const endTime = performance.now()
-				output('log', `time: ${endTime - startTime}`)
-			}, 4)
-		}
+		// const key = JSON.stringify(parameters)
+
+		// const cache = (() => {
+		// 	const cacheString = localStorage.getItem('autograms-cache')
+		// 	if (cacheString == null) {
+		// 		localStorage.setItem('autograms-cache', JSON.stringify({}))
+		// 		return {}
+		// 	} else {
+		// 		return JSON.parse(cacheString)
+		// 	}
+		// })()
+
+		// if (cache.hasOwnProperty(key)) {
+		// 	output('cache', cache[key])
+		// } else {
+
+				// if (!cache.hasOwnProperty(key)) {
+				// 	cache[key] = []
+				// 	localStorage.setItem('autograms-cache', JSON.stringify(cache))
+				// }
+
+				worker.postMessage({ type: 'solve', parameters })
+
+		// }
 	})
 })()
