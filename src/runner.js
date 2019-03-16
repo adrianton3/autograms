@@ -167,7 +167,7 @@
 	function getInfo (numerals, startStrings, fudge, prefix, output) {
 		output('log', `numerals ${numerals.length}`)
 
-		const letters = getLetters(numerals)
+		const letters = getLettersSorted(numerals)
 		output('log', 'letters:')
 		output('log', letters.join(' '))
 
@@ -188,7 +188,7 @@
 	}
 
 	function run (numerals, startStrings, fudge, prefix, output) {
-		const letters = getLetters(numerals)
+		const letters = getLettersSorted(numerals)
 
 		const signatures = getSignatures(letters, numerals)
 		const indexMax = letters.length
@@ -310,7 +310,7 @@
 	}
 
 	function runPartial (numerals, startStrings, _fudge, indexMax, output) {
-		const letters = getLetters(numerals)
+		const letters = getLettersSorted(numerals)
 
 		const signatures = getSignatures(letters, numerals)
 		const countMax = getCountMax(letters, signatures)
