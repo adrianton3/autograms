@@ -136,6 +136,8 @@
 	worker.addEventListener('message', ({ data }) => {
 		if (data.type === 'time') {
 			if (data.data < fudgeTimeMin) {
+				output(data.type, data.data)
+
 				fudgeExtra++
 				output('log', `increase fudge to ${parameters.fudge + fudgeExtra}`)
 
@@ -149,9 +151,9 @@
 					})
 				}, 1000)
 			}
+		} else {
+			output(data.type, data.data)
 		}
-
-		output(data.type, data.data)
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
