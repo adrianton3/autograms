@@ -59,12 +59,12 @@
 	}
 
 	function getSignature (letters, numeral) {
-		return letters.map((letter) => {
+		return new Uint8Array(letters.map((letter) => {
 			const regex = new RegExp(letter, 'g')
 			const match = numeral.match(regex)
 
 			return match != null ? match.length : 0
-		})
+		}))
 	}
 
 	function getSignatures (letters, numerals) {
