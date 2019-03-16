@@ -140,9 +140,9 @@
 
 	worker.addEventListener('message', ({ data }) => {
 		if (data.type === 'time') {
-			if (data.data < fudgeTimeMin) {
-				output(data.type, data.data)
+			output(data.type, data.data)
 
+			if (data.data < fudgeTimeMin) {
 				fudgeExtra++
 				output('log', `increase fudge to ${parameters.fudge + fudgeExtra}`)
 
@@ -162,7 +162,7 @@
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
-		document.getElementById('out').value = 'searching'
+		document.getElementById('out').value = '=== info'
 
 		parameters = getParameters()
 		fudgeExtra = 0
@@ -188,6 +188,16 @@
 				// 	cache[key] = []
 				// 	localStorage.setItem('autograms-cache', JSON.stringify(cache))
 				// }
+
+				auto.runner.getInfo(
+					auto.languages[parameters.language].numerals,
+					parameters.startStrings,
+					parameters.fudge,
+					parameters.prefix,
+					output
+				)
+
+				output('log', '\n=== searching')
 
 				worker.postMessage({ type: 'solve', parameters })
 

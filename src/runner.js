@@ -152,24 +152,39 @@
 		})
 	}
 
-	function run (numerals, startStrings, fudge, prefix, output) {
+	function getInfo (numerals, startStrings, fudge, prefix, output) {
+		output('log', `numerals: ${numerals.length}`)
+
 		const letters = getLetters(numerals)
 		output('log', 'letters:')
 		output('log', letters.join(' '))
+
+		const signatures = getSignatures(letters, numerals)
+		const countMax = getCountMax(letters, signatures)
+
+		output('log', 'count max:')
+		output('log', countMax)
+
+		const countStartMin = getCountMin(numerals, letters, startStrings)
+		const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
+
+		output('log', 'count start min:')
+		output('log', countStartMin)
+
+		output('log', 'count start rest:')
+		output('log', countStartRest)
+	}
+
+	function run (numerals, startStrings, fudge, prefix, output) {
+		const letters = getLetters(numerals)
 
 		const signatures = getSignatures(letters, numerals)
 		const indexMax = letters.length
 		const countMax = getCountMax(letters, signatures)
 		const maxMax = numerals.length - 1
 
-		// output('log', 'count max:')
-		// output('log', countMax)
-
 		const countStartMin = getCountMin(numerals, letters, startStrings)
 		const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
-
-		// output('log', 'count min:')
-		// output('log', countStartMin)
 
 		const solution = new Int8Array(letters.length)
 		const sum = countStartMin.slice()
@@ -286,6 +301,7 @@
 	auto.runner = auto.runner || {}
 	Object.assign(auto.runner, {
 		run,
+		getInfo,
 		getLetters,//: getLettersSorted,
 		getSignatures,
 		getCountMax,
