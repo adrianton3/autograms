@@ -165,7 +165,7 @@
 	}
 
 	function getInfo (numerals, startStrings, fudge, prefix, output) {
-		output('log', `numerals: ${numerals.length}`)
+		output('log', `numerals ${numerals.length}`)
 
 		const letters = getLetters(numerals)
 		output('log', 'letters:')
@@ -309,14 +309,87 @@
 		}
 	}
 
+	function runPartial (numerals, startStrings, _fudge, indexMax, output) {
+		const letters = getLetters(numerals)
 
+		const signatures = getSignatures(letters, numerals)
+		const countMax = getCountMax(letters, signatures)
+		const maxMax = numerals.length - 1
+
+		const countStartMin = getCountMin(numerals, letters, startStrings)
+		const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
+		const countStartRestMax = getMax(countStartRest)
+
+		const solution = new Int8Array(letters.length)
+		const sum = countStartMin.slice()
+
+		function bt (index) {
+			if (index < indexMax - 1) {
+				// find min from partial
+				const min = sum[index]
+				const max = Math.min(
+					min + (letters.length - index) * countMax[index] + countStartRestMax[index] + 1 /* self @ */,
+					maxMax,
+				)
+
+				for (let i = min; i <= max; i++) {
+					// apply partial
+					solution[index] = i
+					const signature = signatures[i]
+					for (let j = 0; j < indexMax; j++) {
+						sum[j] += signature[j]
+					}
+
+					// apply itself
+					if (i > 0) {
+						sum[index]++
+					}
+
+					// validate partial
+					let partial = true
+					for (let j = 0; j <= index; j++) {
+						if (sum[j] > solution[j]) {
+							partial = false
+							break
+						}
+					}
+
+					if (partial) {
+						// recurse
+						bt(index + 1)
+					}
+
+					// remove partial
+					for (let j = 0; j < indexMax; j++) {
+						sum[j] -= signature[j]
+					}
+
+					// remove itself
+					if (i > 0) {
+						sum[index]--
+					}
+				}
+			} else {
+				const min = sum[index]
+				const max = Math.min(
+					min + (letters.length - index) * countMax[index] + countStartRestMax[index] + 1 /* self @ */,
+					maxMax,
+				)
+
+				for (let i = min; i <= max; i++) {
+					solution[index] = i
+					output('partial', solution.slice(0, index + 1))
+				}
+			}
+		}
+
+		bt(0)
+	}
 
 	auto.runner = auto.runner || {}
 	Object.assign(auto.runner, {
-		run,
 		getInfo,
-		getLetters,//: getLettersSorted,
-		getSignatures,
-		getCountMax,
+		run,
+		runPartial
 	})
 })()
