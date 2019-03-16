@@ -182,9 +182,6 @@
 
 		output('log', 'count start min:')
 		output('log', countStartMin)
-
-		output('log', 'count start rest:')
-		output('log', countStartRest)
 	}
 
 	function run (numerals, startStrings, fudge, prefix, output) {
