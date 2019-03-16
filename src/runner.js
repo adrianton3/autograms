@@ -59,7 +59,7 @@
 	}
 
 	function getSignature (letters, numeral) {
-		return new Uint8Array(letters.map((letter) => {
+		return new Int8Array(letters.map((letter) => {
 			const regex = new RegExp(letter, 'g')
 			const match = numeral.match(regex)
 
@@ -72,7 +72,7 @@
 	}
 
 	function getCountMax (letters, signatures) {
-		const max = new Uint8Array(letters.length)
+		const max = new Int8Array(letters.length)
 
 		signatures.forEach((signature) => {
 			signature.forEach((value, index) => {
@@ -113,7 +113,7 @@
 	}
 
 	function getCountLetters (letters, string) {
-		const count = new Uint8Array(letters.length)
+		const count = new Int8Array(letters.length)
 
 		;[...string.toLowerCase()].forEach((char) => {
 			const index = letters.indexOf(char)
@@ -126,7 +126,33 @@
 		return count
 	}
 
-	function run (numerals, startString, fudge, prefix, output) {
+	function getCountMin (numerals, letters, startStrings) {
+		const min = new Int8Array(letters.length).fill(127)
+
+		startStrings.forEach((startString) => {
+			const countNonLetters = getCountNonLetters(letters, startString)
+			const inflated = inflateNonLetters(numerals, countNonLetters, startString)
+			const countLetters = getCountLetters(letters, inflated)
+
+			letters.forEach((letter, index) => {
+				min[index] = Math.min(min[index], countLetters[index])
+			})
+		})
+
+		return min
+	}
+
+	function getCountRest (numerals, letters, startStrings, countStartMin) {
+		return startStrings.map((startString) => {
+			const countNonLetters = getCountNonLetters(letters, startString)
+			const inflated = inflateNonLetters(numerals, countNonLetters, startString)
+			const countLetters = getCountLetters(letters, inflated)
+
+			return new Int8Array(countLetters.map((value, index) => value - countStartMin[index]))
+		})
+	}
+
+	function run (numerals, startStrings, fudge, prefix, output) {
 		const letters = getLetters(numerals)
 		output('log', 'letters:')
 		output('log', letters.join(' '))
@@ -136,23 +162,19 @@
 		const countMax = getCountMax(letters, signatures)
 		const maxMax = numerals.length - 1
 
-		output('log', 'count max:')
-		output('log', countMax)
+		// output('log', 'count max:')
+		// output('log', countMax)
 
-		const countNonLetters = getCountNonLetters(letters, startString)
-		const inflated = inflateNonLetters(numerals, countNonLetters, startString)
-		const countLetters = getCountLetters(letters, inflated)
+		const countStartMin = getCountMin(numerals, letters, startStrings)
+		const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
 
-		if (startString.trim().length > 0) {
-			output('log', 'inflated:')
-			output('log', inflated)
+		// output('log', 'count min:')
+		// output('log', countStartMin)
 
-			output('log', 'starting from:')
-			output('log', countLetters.join(' '))
-		}
+		const solution = new Int8Array(letters.length)
+		const sum = countStartMin.slice()
 
-		const solution = new Uint8Array(letters.length)
-		const sum = countLetters.slice()
+		const restCandidate = new Int8Array(letters.length)
 
 		function bt (index) {
 			if (index < indexMax - 1) {
@@ -211,16 +233,24 @@
 					solution[index] = i
 					const signature = signatures[i]
 
-					let valid = true
 					for (let j = 0; j < indexMax; j++) {
-						if (sum[j] + signature[j] + (i > 0 ? 1 : 0) !== solution[j]) {
-							valid = false
-							break
-						}
+						restCandidate[j] = -(sum[j] + signature[j] + (i > 0 ? 1 : 0) - solution[j])
 					}
 
-					if (valid && solution.some(Boolean)) {
-						output('solution', solution.join(' '))
+					for (let j = 0; j < countStartRest.length; j++) {
+						const rest = countStartRest[j]
+
+						let valid = true
+						for (let k = 0; k < indexMax; k++) {
+							if (rest[k] !== restCandidate[k]) {
+								valid = false
+								break
+							}
+						}
+
+						if (valid && solution.some(Boolean)) {
+							output('solution', solution.join(' '))
+						}
 					}
 				}
 			}

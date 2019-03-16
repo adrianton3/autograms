@@ -115,15 +115,20 @@
 
 		const fudgeStart = Number(document.getElementById('fudge-start').value)
 
-		const intro = document.getElementById('intro').value
-		const lastSeparator = document.getElementById('last-separator').value
+		// const intro = document.getElementById('intro').value
+		// const lastSeparator = document.getElementById('last-separator').value
+
+		const startStrings = auto.languages[language].intros.flatMap((intro) =>
+			auto.languages[language].lastSeparators.map((lastSeparator) =>
+				`${intro} ${lastSeparator}`
+			)
+		)
 
 		return {
 			language,
-			intro,
-			lastSeparator,
 			fudge: fudgeStart,
 			prefix,
+			startStrings,
 		}
 	}
 

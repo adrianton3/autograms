@@ -20,7 +20,7 @@
 
 			auto.runner.run(
 				auto.languages[parameters.language].numerals,
-				`${parameters.intro} ${parameters.lastSeparator}`,
+				parameters.startStrings,
 				parameters.fudge,
 				parameters.prefix,
 				(type, data) => { postMessage({ type, data }) },
