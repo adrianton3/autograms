@@ -3,8 +3,24 @@
 
 	const romanian = {
 		intros: [
-			'Această frază este alcătuită din',
+			'Următoarea frază conține',
+			'Următoarea frază are',
+			'Următoarea frază include',
+			'Următoarea frază cuprinde',
+			'Următoarea frază înglobează',
+			'Următoarea frază este alcătuită din',
+			'Următoarea frază este formată din',
+
 			'Această frază conține',
+			'Această frază are',
+			'Această frază include',
+			'Această frază cuprinde',
+			'Această frază înglobează',
+			'Această frază este alcătuită din',
+			'Această frază este formată din',
+
+			'În alcătuirea aceastei fraze intră',
+
 			'În această frază se află',
 			'În această frază se găsesc',
 			'În această frază se pot număra',
