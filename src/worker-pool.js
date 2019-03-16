@@ -36,10 +36,12 @@
 			return ({ data }) => {
 				if (data.type === 'end') {
 					status[index] = 'cooldown'
+					output({ type: 'status', data: status })
 
 					setTimeout(() => {
 						status[index] = 'idle'
 						dispatch()
+						output({ type: 'status', data: status })
 					}, cooldown)
 
 				}
@@ -57,10 +59,13 @@
 			status.push('idle')
 		}
 
+		output({ type: 'status', data: status })
+
 		return {
 			post (message) {
 				queue.push(message)
 				dispatch()
+				output({ type: 'status', data: status })
 			},
 			setSize (newSize) {
 				size = Math.min(sizeMax, newSize)

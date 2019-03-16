@@ -10,22 +10,18 @@
 		languageElement.appendChild(option)
 	})
 
+	const outLogElement = document.getElementById('out-log')
+	const outSolutionsElement = document.getElementById('out-solutions')
+	const outStatusElement = document.getElementById('out-status')
+
 	function output (type, data) {
-		const outElement = document.getElementById('out')
-
 		if (type === 'log') {
-			outElement.value += `\n${data}`
+			outLogElement.value = `${outLogElement.value.slice(0, 1000)}\n${data}`
 		} else if (type === 'solution') {
-			outElement.value += `\nsolution:\n${data}`
-		} else if (type === 'time') {
-			const value = data >= 1000 * 60 * 60 ? `${(data / (1000 * 60 * 60)).toFixed(1)} h`
-				: data >= 1000 * 60 ? `${(data / (1000 * 60)).toFixed(1)} m`
-				: data >= 1000 ? `${(data / 1000).toFixed(1)} s`
-				: `${data.toFixed(1)} ms`
-
-			outElement.value += `\ntime: ${value}`
-		} else if (type === 'cache') {
-			outElement.value += `\ncached solutions:\n${data.join('\n')}`
+			console.log(data)
+			outSolutionsElement.value += `solution:\n${data}\n`
+		} else if (type === 'status') {
+			outStatusElement.value = data.map((status, index) => `thread ${index}: ${status}`).join('\n')
 		}
 	}
 
@@ -102,7 +98,7 @@
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
-		document.getElementById('out').value = '=== info'
+		outLogElement.value = '=== info'
 
 		parameters = getParameters()
 
