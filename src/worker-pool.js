@@ -67,6 +67,9 @@
 				dispatch()
 				output({ type: 'status', data: status })
 			},
+			getSize () {
+				return size
+			},
 			setSize (newSize) {
 				size = Math.min(sizeMax, newSize)
 			}

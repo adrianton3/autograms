@@ -66,6 +66,22 @@
 			: `${ms.toFixed(1)} ms`
 	}
 
+	function postPartial () {
+		if (partialsIndex >= partials.length) {
+			return
+		}
+
+		pool.post({
+			type: 'solve',
+			parameters: {
+				...parameters,
+				prefix: partials[partialsIndex],
+			},
+		})
+
+		partialsIndex++
+	}
+
 	function handleMessage (message) {
 		if (message.type === 'end') {
 			if (
@@ -83,15 +99,7 @@
 			} else if (partialsIndex < partials.length) {
 				output('log', `max fudge ${message.fudge} for ${message.prefix}`)
 
-				pool.post({
-					type: 'solve',
-					parameters: {
-						...parameters,
-						prefix: partials[partialsIndex],
-					},
-				})
-
-				partialsIndex++
+				postPartial()
 			}
 		} else {
 			output(message.type, message.data)
@@ -101,7 +109,14 @@
 	const threadCountMaxElement = document.getElementById('thread-count-max')
 
 	threadCountMaxElement.addEventListener('change', () => {
-		pool.setSize(Number(threadCountMaxElement.value))
+		const poolSizeOld = pool.getSize()
+		const poolSizeNew = Number(threadCountMaxElement.value)
+
+		pool.setSize(poolSizeNew)
+
+		for (let i = poolSizeOld; i < poolSizeNew; i++) {
+			postPartial()
+		}
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
@@ -148,15 +163,7 @@
 		pool.setSize(poolSize)
 
 		for (let i = 0; i < poolSize; i++) {
-			pool.post({
-				type: 'solve',
-				parameters: {
-					...parameters,
-					prefix: partials[partialsIndex],
-				},
-			})
-
-			partialsIndex++
+			postPartial()
 		}
 	})
 })()
