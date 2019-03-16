@@ -12,24 +12,16 @@
             padding: 2px;
         }
 
-        #out {
-            height: 250px;
+        textarea {
             width: 500px;
         }
 
-        #intro {
-            width: 200px;
+        #out-log {
+            height: 150px;
         }
 
-        #last-separator {
-            width: 60px;
-        }
-
-        #first-letter,#second-letter {
-            font-family: monospace;
-            background-color: hsl(0, 0%, 92%);
-            padding-left: 2px;
-            padding-right: 2px;
+        #out-solutions,#out-status {
+            height: 50px;
         }
     </style>
 </head>
@@ -46,21 +38,27 @@
         <label for="fudge-time-min">Min time (s)</label> <input id="fudge-time-min" type="number" value="30" min="0" max="3600">
     </div>
 
+    <div>
+        <label for="thread-count-max">Thread count max</label> <input id="thread-count-max" type="number" value="2" min="1" max="32">
+    </div>
+
     <div><button id="run">Run</button></div>
 
-    <div>
-        <label for="out">Output</label>
-    </div>
+    <div><label for="out-log">Output</label></div>
+    <div><textarea id="out-log"></textarea></div>
 
-    <div>
-        <textarea id="out"></textarea>
-    </div>
+    <div><label for="out-solutions">Solutions</label></div>
+    <div><textarea id="out-solutions"></textarea></div>
+
+    <div><label for="out-status">Status</label></div>
+    <div><textarea id="out-status"></textarea></div>
 
     <script>window.auto = {}</script>
 
     <script src="languages/italian.js"></script>
     <script src="languages/romanian.js"></script>
 
+    <script src="src/worker-pool.js"></script>
     <script src="src/runner.js"></script>
     <script src="src/main.js"></script>
 </body>

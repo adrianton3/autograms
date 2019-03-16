@@ -10,22 +10,18 @@
 		languageElement.appendChild(option)
 	})
 
+	const outLogElement = document.getElementById('out-log')
+	const outSolutionsElement = document.getElementById('out-solutions')
+	const outStatusElement = document.getElementById('out-status')
+
 	function output (type, data) {
-		const outElement = document.getElementById('out')
-
 		if (type === 'log') {
-			outElement.value += `\n${data}`
+			outLogElement.value += `${data}\n`
 		} else if (type === 'solution') {
-			outElement.value += `\nsolution:\n${data}`
-		} else if (type === 'time') {
-			const value = data >= 1000 * 60 * 60 ? `${(data / (1000 * 60 * 60)).toFixed(1)} h`
-				: data >= 1000 * 60 ? `${(data / (1000 * 60)).toFixed(1)} m`
-				: data >= 1000 ? `${(data / 1000).toFixed(1)} s`
-				: `${data.toFixed(1)} ms`
-
-			outElement.value += `\ntime: ${value}`
-		} else if (type === 'cache') {
-			outElement.value += `\ncached solutions:\n${data.join('\n')}`
+			console.log(data)
+			outSolutionsElement.value += `solution:\n${data}\n`
+		} else if (type === 'status') {
+			outStatusElement.value = data.map((status, index) => `thread ${index}: ${status}`).join('\n')
 		}
 	}
 
@@ -48,60 +44,86 @@
 		}
 	}
 
-	const worker = new Worker('src/worker.js')
+	const cooldown = 500
+
+	const pool = auto.makePool(
+		Math.max(1, navigator.hardwareConcurrency - 1),
+		cooldown,
+		handleMessage,
+	)
 
 	let parameters
 
-	let fudgeExtra
 	let fudgeTimeMin
 
 	let partials
 	let partialsIndex
 
-	worker.addEventListener('message', ({ data }) => {
-		if (data.type === 'time') {
-			if (fudgeExtra < 10 && data.data < fudgeTimeMin) {
-				fudgeExtra++
+	function stringifyTime (ms) {
+		return ms >= 1000 * 60 * 60 ? `${(ms / (1000 * 60 * 60)).toFixed(1)} h`
+			: ms >= 1000 * 60 ? `${(ms / (1000 * 60)).toFixed(1)} m`
+			: ms >= 1000 ? `${(ms / 1000).toFixed(1)} s`
+			: `${ms.toFixed(1)} ms`
+	}
 
-				setTimeout(() => {
-					worker.postMessage({
-						type: 'solve',
-						parameters: {
-							...parameters,
-							fudge: parameters.fudge + fudgeExtra,
-							prefix: partials[partialsIndex],
-						},
-					})
-				}, 1000)
+	function postPartial () {
+		if (partialsIndex >= partials.length) {
+			return
+		}
+
+		pool.post({
+			type: 'solve',
+			parameters: {
+				...parameters,
+				prefix: partials[partialsIndex],
+			},
+		})
+
+		partialsIndex++
+	}
+
+	function handleMessage (message) {
+		if (message.type === 'end') {
+			if (
+				message.fudge < parameters.fudge + 10 &&
+				message.time < fudgeTimeMin
+			) {
+				pool.post({
+					type: 'solve',
+					parameters: {
+						...parameters,
+						fudge: message.fudge + 1,
+						prefix: message.prefix,
+					},
+				})
 			} else if (partialsIndex < partials.length) {
-				output('log', `max fudge ${parameters.fudge + fudgeExtra}`)
+				output('log', `max fudge ${message.fudge} for ${message.prefix}`)
 
-				fudgeExtra = 0
-				partialsIndex++
-
-				output('log', `new partial ${partials[partialsIndex].join(' ')}`)
-
-				setTimeout(() => {
-					worker.postMessage({
-						type: 'solve',
-						parameters: {
-							...parameters,
-							prefix: partials[partialsIndex],
-						},
-					})
-				}, 1000)
+				postPartial()
 			}
 		} else {
-			output(data.type, data.data)
+			output(message.type, message.data)
+		}
+	}
+
+	const threadCountMaxElement = document.getElementById('thread-count-max')
+
+	threadCountMaxElement.addEventListener('change', () => {
+		const poolSizeOld = pool.getSize()
+		const poolSizeNew = Number(threadCountMaxElement.value)
+
+		pool.setSize(poolSizeNew)
+
+		for (let i = poolSizeOld; i < poolSizeNew; i++) {
+			postPartial()
 		}
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
-		document.getElementById('out').value = '=== info'
+		outLogElement.value = '=== info\n'
 
 		parameters = getParameters()
 
-		fudgeExtra = 0
 		fudgeTimeMin = Number(document.getElementById('fudge-time-min').value) * 1000
 
 		partials = []
@@ -132,10 +154,16 @@
 
 		output('log', '\n=== partials')
 		output('log', `count ${partials.length}`)
+		output('log', `estimated min time ${stringifyTime(partials.length * (fudgeTimeMin + cooldown))}`)
 
 		output('log', '\n=== searching')
 
-		output('log', `new partial ${partials[partialsIndex].join(' ')}`)
-		worker.postMessage({ type: 'solve', parameters })
+		const poolSize = Number(threadCountMaxElement.value)
+
+		pool.setSize(poolSize)
+
+		for (let i = 0; i < poolSize; i++) {
+			postPartial()
+		}
 	})
 })()
