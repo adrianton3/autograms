@@ -95,6 +95,12 @@
 		}
 	}
 
+	const threadCountMaxElement = document.getElementById('thread-count-max')
+
+	threadCountMaxElement.addEventListener('change', () => {
+		pool.setSize(Number(threadCountMaxElement.value))
+	})
+
 	document.getElementById('run').addEventListener('click', () => {
 		document.getElementById('out').value = '=== info'
 
@@ -134,6 +140,8 @@
 		output('log', '\n=== searching')
 
 		output('log', `new partial ${partials[partialsIndex].join(' ')}`)
+
+		pool.setSize(Number(threadCountMaxElement.value))
 
 		pool.post({
 			type: 'solve',

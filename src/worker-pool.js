@@ -1,7 +1,9 @@
 (() => {
 	'use strict'
 
-	function makePool (size, cooldown, output) {
+	function makePool (sizeMax, cooldown, output) {
+		let size = sizeMax
+
 		const queue = []
 
 		const workers = []
@@ -13,14 +15,20 @@
 			}
 
 			while (queue.length > 0) {
-				const idleWorkerIndex = status.findIndex((status) => status === 'idle')
+				let allBusy = true
 
-				if (idleWorkerIndex < 0) {
-					return
+				for (let i = 0; i < size; i++) {
+					if (status[i] === 'idle') {
+						workers[i].postMessage(queue.shift())
+						status[i] = 'busy'
+						allBusy = false
+						break
+					}
 				}
 
-				workers[idleWorkerIndex].postMessage(queue.shift())
-				status[idleWorkerIndex] = 'busy'
+				if (allBusy) {
+					break
+				}
 			}
 		}
 
@@ -40,7 +48,7 @@
 			}
 		}
 
-		for (let i = 0; i < size; i++) {
+		for (let i = 0; i < sizeMax; i++) {
 			const worker = new Worker('src/worker.js')
 
 			worker.addEventListener('message', makeMessageHandler(i))
@@ -54,6 +62,9 @@
 				queue.push(message)
 				dispatch()
 			},
+			setSize (newSize) {
+				size = Math.min(sizeMax, newSize)
+			}
 		}
 	}
 	
