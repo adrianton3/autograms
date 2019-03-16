@@ -152,6 +152,18 @@
 		})
 	}
 
+	function getMax (entries) {
+		const max = new Int8Array(entries[0].length).fill(0)
+
+		entries.forEach((entry) => {
+			entry.forEach((value, index) => {
+				max[index] = Math.max(max[index], value)
+			})
+		})
+
+		return max
+	}
+
 	function getInfo (numerals, startStrings, fudge, prefix, output) {
 		output('log', `numerals: ${numerals.length}`)
 
@@ -185,6 +197,7 @@
 
 		const countStartMin = getCountMin(numerals, letters, startStrings)
 		const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
+		const countStartRestMax = getMax(countStartRest)
 
 		const solution = new Int8Array(letters.length)
 		const sum = countStartMin.slice()
@@ -196,7 +209,7 @@
 				// find min from partial
 				const min = sum[index]
 				const max = Math.min(
-					min + Math.min(fudge, (indexMax - index) * countMax[index] + 1 /* self @ */),
+					min + Math.min(fudge, (indexMax - index) * countMax[index] + countStartRestMax[index] + 1 /* self @ */),
 					maxMax,
 				)
 
@@ -240,7 +253,7 @@
 			} else {
 				const min = sum[index]
 				const max = Math.min(
-					min + countMax[index] + 1 /* self @ */,
+					min + countMax[index] + countStartRestMax[index] + 1 /* self @ */,
 					maxMax,
 				)
 
