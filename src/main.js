@@ -72,11 +72,7 @@
 					},
 				})
 			} else if (partialsIndex < partials.length) {
-				output('log', `max fudge ${message.fudge}`)
-
-				partialsIndex++
-
-				output('log', `new partial ${partials[partialsIndex].join(' ')}`)
+				output('log', `max fudge ${message.fudge} for ${message.prefix}`)
 
 				pool.post({
 					type: 'solve',
@@ -85,6 +81,8 @@
 						prefix: partials[partialsIndex],
 					},
 				})
+
+				partialsIndex++
 			}
 		} else {
 			output(message.type, message.data)
@@ -135,13 +133,20 @@
 
 		output('log', '\n=== searching')
 
-		output('log', `new partial ${partials[partialsIndex].join(' ')}`)
+		const poolSize = Number(threadCountMaxElement.value)
 
-		pool.setSize(Number(threadCountMaxElement.value))
+		pool.setSize(poolSize)
 
-		pool.post({
-			type: 'solve',
-			parameters,
-		})
+		for (let i = 0; i < poolSize; i++) {
+			pool.post({
+				type: 'solve',
+				parameters: {
+					...parameters,
+					prefix: partials[partialsIndex],
+				},
+			})
+
+			partialsIndex++
+		}
 	})
 })()
