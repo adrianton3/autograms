@@ -48,60 +48,58 @@
 		}
 	}
 
-	const worker = new Worker('src/worker.js')
+	const pool = auto.makePool(
+		Math.max(1, navigator.hardwareConcurrency - 1),
+		500,
+		handleMessage,
+	)
 
 	let parameters
 
-	let fudgeExtra
 	let fudgeTimeMin
 
 	let partials
 	let partialsIndex
 
-	worker.addEventListener('message', ({ data }) => {
-		if (data.type === 'time') {
-			if (fudgeExtra < 10 && data.data < fudgeTimeMin) {
-				fudgeExtra++
-
-				setTimeout(() => {
-					worker.postMessage({
-						type: 'solve',
-						parameters: {
-							...parameters,
-							fudge: parameters.fudge + fudgeExtra,
-							prefix: partials[partialsIndex],
-						},
-					})
-				}, 1000)
+	function handleMessage (message) {
+		if (message.type === 'end') {
+			if (
+				message.fudge < parameters.fudge + 10 &&
+				message.time < fudgeTimeMin
+			) {
+				pool.post({
+					type: 'solve',
+					parameters: {
+						...parameters,
+						fudge: message.fudge + 1,
+						prefix: message.prefix,
+					},
+				})
 			} else if (partialsIndex < partials.length) {
-				output('log', `max fudge ${parameters.fudge + fudgeExtra}`)
+				output('log', `max fudge ${message.fudge}`)
 
-				fudgeExtra = 0
 				partialsIndex++
 
 				output('log', `new partial ${partials[partialsIndex].join(' ')}`)
 
-				setTimeout(() => {
-					worker.postMessage({
-						type: 'solve',
-						parameters: {
-							...parameters,
-							prefix: partials[partialsIndex],
-						},
-					})
-				}, 1000)
+				pool.post({
+					type: 'solve',
+					parameters: {
+						...parameters,
+						prefix: partials[partialsIndex],
+					},
+				})
 			}
 		} else {
-			output(data.type, data.data)
+			output(message.type, message.data)
 		}
-	})
+	}
 
 	document.getElementById('run').addEventListener('click', () => {
 		document.getElementById('out').value = '=== info'
 
 		parameters = getParameters()
 
-		fudgeExtra = 0
 		fudgeTimeMin = Number(document.getElementById('fudge-time-min').value) * 1000
 
 		partials = []
@@ -136,6 +134,10 @@
 		output('log', '\n=== searching')
 
 		output('log', `new partial ${partials[partialsIndex].join(' ')}`)
-		worker.postMessage({ type: 'solve', parameters })
+
+		pool.post({
+			type: 'solve',
+			parameters,
+		})
 	})
 })()

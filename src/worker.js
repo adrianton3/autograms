@@ -28,7 +28,12 @@
 
 			const endTime = performance.now()
 
-			postMessage({ type: 'time', data: endTime - startTime })
+			postMessage({
+				type: 'end',
+				fudge: parameters.fudge,
+				prefix: parameters.prefix,
+				time: endTime - startTime,
+			})
 		}
 	})
 })()

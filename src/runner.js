@@ -178,7 +178,6 @@
 		output('log', countMax)
 
 		const countStartMin = getCountMin(numerals, letters, startStrings)
-		const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
 
 		output('log', 'count start min:')
 		output('log', countStartMin)
