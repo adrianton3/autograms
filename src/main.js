@@ -16,7 +16,7 @@
 
 	function output (type, data) {
 		if (type === 'log') {
-			outLogElement.value = `${outLogElement.value.slice(0, 1000)}\n${data}`
+			outLogElement.value += `${data}\n`
 		} else if (type === 'solution') {
 			console.log(data)
 			outSolutionsElement.value += `solution:\n${data}\n`
@@ -44,9 +44,11 @@
 		}
 	}
 
+	const cooldown = 500
+
 	const pool = auto.makePool(
 		Math.max(1, navigator.hardwareConcurrency - 1),
-		500,
+		cooldown,
 		handleMessage,
 	)
 
@@ -56,6 +58,13 @@
 
 	let partials
 	let partialsIndex
+
+	function stringifyTime (ms) {
+		return ms >= 1000 * 60 * 60 ? `${(ms / (1000 * 60 * 60)).toFixed(1)} h`
+			: ms >= 1000 * 60 ? `${(ms / (1000 * 60)).toFixed(1)} m`
+			: ms >= 1000 ? `${(ms / 1000).toFixed(1)} s`
+			: `${ms.toFixed(1)} ms`
+	}
 
 	function handleMessage (message) {
 		if (message.type === 'end') {
@@ -96,7 +105,7 @@
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
-		outLogElement.value = '=== info'
+		outLogElement.value = '=== info\n'
 
 		parameters = getParameters()
 
@@ -130,6 +139,7 @@
 
 		output('log', '\n=== partials')
 		output('log', `count ${partials.length}`)
+		output('log', `estimated min time ${stringifyTime(partials.length * (fudgeTimeMin + cooldown))}`)
 
 		output('log', '\n=== searching')
 
