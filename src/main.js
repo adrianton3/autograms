@@ -87,7 +87,7 @@
 			const value = data >= 1000 * 60 * 60 ? `${(data / (1000 * 60 * 60)).toFixed(1)} h`
 				: data >= 1000 * 60 ? `${(data / (1000 * 60)).toFixed(1)} m`
 				: data >= 1000 ? `${(data / 1000).toFixed(1)} s`
-				: `${data} ms`
+				: `${data.toFixed(1)} ms`
 
 			outElement.value += `\ntime: ${value}`
 		} else if (type === 'cache') {
