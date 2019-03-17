@@ -9,7 +9,7 @@
 			(192 <= code && code < 592)
 	}
 
-	function getLetters (numerals) {
+	function getLettersAlphabetic (numerals) {
 		const set = new Set
 
 		numerals.forEach((numeral) => {
@@ -56,6 +56,12 @@
 		const entries = [...max]
 		entries.sort((a, b) => a[1] - b[1])
 		return entries.map((entry) => entry[0])
+	}
+
+	function getLetters (numerals, ordering) {
+		return ordering === 'alphabetic'
+			? getLettersAlphabetic(numerals)
+			: getLettersSorted(numerals)
 	}
 
 	function getSignature (letters, numeral) {
@@ -164,10 +170,10 @@
 		return max
 	}
 
-	function getInfo (numerals, startStrings, fudge, prefix, output) {
+	function getInfo (numerals, ordering, startStrings, fudge, prefix, output) {
 		output('log', `numerals ${numerals.length}`)
 
-		const letters = getLettersSorted(numerals)
+		const letters = getLetters(numerals, ordering)
 		output('log', 'letters:')
 		output('log', letters.join(' '))
 
@@ -183,8 +189,8 @@
 		output('log', countStartMin)
 	}
 
-	function run (numerals, startStrings, fudge, prefix, output) {
-		const letters = getLettersSorted(numerals)
+	function run (numerals, ordering, startStrings, fudge, prefix, output) {
+		const letters = getLetters(numerals, ordering)
 
 		const signatures = getSignatures(letters, numerals)
 		const indexMax = letters.length
@@ -305,8 +311,8 @@
 		}
 	}
 
-	function runPartial (numerals, startStrings, _fudge, indexMax, output) {
-		const letters = getLettersSorted(numerals)
+	function runPartial (numerals, ordering, startStrings, _fudge, indexMax, output) {
+		const letters = getLetters(numerals, ordering)
 
 		const signatures = getSignatures(letters, numerals)
 		const countMax = getCountMax(letters, signatures)

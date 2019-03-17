@@ -55,6 +55,8 @@
 	function getParameters () {
 		const language = languageElement.value
 
+		const orderingAlphabetic = document.getElementById('ordering-alphabetic').checked
+
 		const fudgeStart = Number(fudgeStartElement.value)
 
 		const optionAutogram = document.getElementById('option-autogram').checked
@@ -73,6 +75,7 @@
 
 		return {
 			language,
+			ordering: orderingAlphabetic ? 'alphabetic' : 'count',
 			fudge: fudgeStart,
 			prefix: null,
 			startStrings,
@@ -160,6 +163,7 @@
 
 		auto.runner.getInfo(
 			auto.languages[parameters.language].numerals,
+			parameters.ordering,
 			parameters.startStrings,
 			parameters.fudge,
 			parameters.prefix,
@@ -168,6 +172,7 @@
 
 		auto.runner.runPartial(
 			auto.languages[parameters.language].numerals,
+			parameters.ordering,
 			parameters.startStrings,
 			parameters.fudge,
 			2,
