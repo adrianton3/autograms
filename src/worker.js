@@ -20,6 +20,7 @@
 
 			auto.runner.run(
 				auto.languages[parameters.language].numerals,
+				parameters.ordering,
 				parameters.startStrings,
 				parameters.fudge,
 				parameters.prefix,
