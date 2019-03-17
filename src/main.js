@@ -25,10 +25,37 @@
 		}
 	}
 
+	const cooldown = 500
+
+	const pool = auto.makePool(
+		Math.max(1, navigator.hardwareConcurrency - 1),
+		cooldown,
+		handleMessage,
+	)
+
+	let parameters = {}
+
+	let fudgeTimeMin = 1
+
+	let partials = []
+	let partialsIndex = 0
+
+	const fudgeStartElement = document.getElementById('fudge-start')
+
+	fudgeStartElement.addEventListener('change', () => {
+		parameters.fudge = Number(fudgeStartElement.value)
+	})
+
+	const fudgeTimeMinElement = document.getElementById('fudge-time-min')
+
+	fudgeTimeMinElement.addEventListener('change', () => {
+		fudgeTimeMin = Number(fudgeTimeMinElement.value) * 1000
+	})
+
 	function getParameters () {
 		const language = languageElement.value
 
-		const fudgeStart = Number(document.getElementById('fudge-start').value)
+		const fudgeStart = Number(fudgeStartElement.value)
 
 		const startStrings = auto.languages[language].intros.flatMap((intro) =>
 			auto.languages[language].lastSeparators.map((lastSeparator) =>
@@ -44,27 +71,18 @@
 		}
 	}
 
-	const cooldown = 500
-
-	const pool = auto.makePool(
-		Math.max(1, navigator.hardwareConcurrency - 1),
-		cooldown,
-		handleMessage,
-	)
-
-	let parameters
-
-	let fudgeTimeMin
-
-	let partials
-	let partialsIndex
-
 	function stringifyTime (ms) {
 		return ms >= 1000 * 60 * 60 ? `${(ms / (1000 * 60 * 60)).toFixed(1)} h`
 			: ms >= 1000 * 60 ? `${(ms / (1000 * 60)).toFixed(1)} m`
 			: ms >= 1000 ? `${(ms / 1000).toFixed(1)} s`
 			: `${ms.toFixed(1)} ms`
 	}
+
+	const threadCountMaxElement = document.getElementById('thread-count-max')
+
+	const partialsIndexElement = document.getElementById('partials-index')
+	const partialsCountElement = document.getElementById('partials-count')
+	const estimatedTimeElement = document.getElementById('estimated-time')
 
 	function postPartial () {
 		if (partialsIndex >= partials.length) {
@@ -80,6 +98,11 @@
 		})
 
 		partialsIndex++
+
+		partialsIndexElement.textContent = `${partialsIndex}`
+
+		const estimatedTime = (partials.length - partialsIndex) * (fudgeTimeMin + cooldown) / Number(threadCountMaxElement.value)
+		estimatedTimeElement.textContent = stringifyTime(estimatedTime)
 	}
 
 	function handleMessage (message) {
@@ -106,8 +129,6 @@
 		}
 	}
 
-	const threadCountMaxElement = document.getElementById('thread-count-max')
-
 	threadCountMaxElement.addEventListener('change', () => {
 		const poolSizeOld = pool.getSize()
 		const poolSizeNew = Number(threadCountMaxElement.value)
@@ -124,7 +145,7 @@
 
 		parameters = getParameters()
 
-		fudgeTimeMin = Number(document.getElementById('fudge-time-min').value) * 1000
+		fudgeTimeMin = Number(fudgeTimeMinElement.value) * 1000
 
 		partials = []
 		partialsIndex = 0
@@ -151,6 +172,8 @@
 				}
 			}
 		)
+
+		partialsCountElement.textContent = `${partials.length}`
 
 		output('log', '\n=== partials')
 		output('log', `count ${partials.length}`)
