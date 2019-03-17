@@ -57,11 +57,19 @@
 
 		const fudgeStart = Number(fudgeStartElement.value)
 
-		const startStrings = auto.languages[language].intros.flatMap((intro) =>
-			auto.languages[language].lastSeparators.map((lastSeparator) =>
-				`${intro} ${lastSeparator}`
-			)
-		)
+		const optionAutogram = document.getElementById('option-autogram').checked
+
+		const startStrings = (() => {
+			if (optionAutogram) {
+				return auto.languages[language].intros.flatMap((intro) =>
+					auto.languages[language].lastSeparators.map((lastSeparator) =>
+						`${intro} ${lastSeparator}`
+					)
+				)
+			}
+
+			return ['']
+		})()
 
 		return {
 			language,
