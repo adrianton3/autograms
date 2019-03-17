@@ -35,10 +35,10 @@
 
 	let parameters = {}
 
-	let fudgeTimeMin
+	let fudgeTimeMin = 1
 
-	let partials
-	let partialsIndex
+	let partials = []
+	let partialsIndex = 0
 
 	const fudgeStartElement = document.getElementById('fudge-start')
 
@@ -78,8 +78,11 @@
 			: `${ms.toFixed(1)} ms`
 	}
 
+	const threadCountMaxElement = document.getElementById('thread-count-max')
+
 	const partialsIndexElement = document.getElementById('partials-index')
 	const partialsCountElement = document.getElementById('partials-count')
+	const estimatedTimeElement = document.getElementById('estimated-time')
 
 	function postPartial () {
 		if (partialsIndex >= partials.length) {
@@ -97,6 +100,9 @@
 		partialsIndex++
 
 		partialsIndexElement.textContent = `${partialsIndex}`
+
+		const estimatedTime = (partials.length - partialsIndex) * (fudgeTimeMin + cooldown) / Number(threadCountMaxElement.value)
+		estimatedTimeElement.textContent = stringifyTime(estimatedTime)
 	}
 
 	function handleMessage (message) {
@@ -122,8 +128,6 @@
 			output(message.type, message.data)
 		}
 	}
-
-	const threadCountMaxElement = document.getElementById('thread-count-max')
 
 	threadCountMaxElement.addEventListener('change', () => {
 		const poolSizeOld = pool.getSize()
