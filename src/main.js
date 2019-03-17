@@ -25,10 +25,37 @@
 		}
 	}
 
+	const cooldown = 500
+
+	const pool = auto.makePool(
+		Math.max(1, navigator.hardwareConcurrency - 1),
+		cooldown,
+		handleMessage,
+	)
+
+	let parameters = {}
+
+	let fudgeTimeMin
+
+	let partials
+	let partialsIndex
+
+	const fudgeStartElement = document.getElementById('fudge-start')
+
+	fudgeStartElement.addEventListener('change', () => {
+		parameters.fudge = Number(fudgeStartElement.value)
+	})
+
+	const fudgeTimeMinElement = document.getElementById('fudge-time-min')
+
+	fudgeTimeMinElement.addEventListener('change', () => {
+		fudgeTimeMin = Number(fudgeTimeMinElement.value) * 1000
+	})
+
 	function getParameters () {
 		const language = languageElement.value
 
-		const fudgeStart = Number(document.getElementById('fudge-start').value)
+		const fudgeStart = Number(fudgeStartElement.value)
 
 		const startStrings = auto.languages[language].intros.flatMap((intro) =>
 			auto.languages[language].lastSeparators.map((lastSeparator) =>
@@ -43,21 +70,6 @@
 			startStrings,
 		}
 	}
-
-	const cooldown = 500
-
-	const pool = auto.makePool(
-		Math.max(1, navigator.hardwareConcurrency - 1),
-		cooldown,
-		handleMessage,
-	)
-
-	let parameters
-
-	let fudgeTimeMin
-
-	let partials
-	let partialsIndex
 
 	function stringifyTime (ms) {
 		return ms >= 1000 * 60 * 60 ? `${(ms / (1000 * 60 * 60)).toFixed(1)} h`
@@ -124,7 +136,7 @@
 
 		parameters = getParameters()
 
-		fudgeTimeMin = Number(document.getElementById('fudge-time-min').value) * 1000
+		fudgeTimeMin = Number(fudgeTimeMinElement.value) * 1000
 
 		partials = []
 		partialsIndex = 0
