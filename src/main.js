@@ -78,6 +78,9 @@
 			: `${ms.toFixed(1)} ms`
 	}
 
+	const partialsIndexElement = document.getElementById('partials-index')
+	const partialsCountElement = document.getElementById('partials-count')
+
 	function postPartial () {
 		if (partialsIndex >= partials.length) {
 			return
@@ -92,6 +95,8 @@
 		})
 
 		partialsIndex++
+
+		partialsIndexElement.textContent = `${partialsIndex}`
 	}
 
 	function handleMessage (message) {
@@ -163,6 +168,8 @@
 				}
 			}
 		)
+
+		partialsCountElement.textContent = `${partials.length}`
 
 		output('log', '\n=== partials')
 		output('log', `count ${partials.length}`)
