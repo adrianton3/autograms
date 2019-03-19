@@ -208,4 +208,19 @@
 			postPartial()
 		}
 	})
+
+	document.getElementById('info').addEventListener('click', () => {
+		outLogElement.value = '=== info\n'
+
+		parameters = getParameters()
+
+		auto.runner.getInfo(
+			auto.languages[parameters.language].numerals,
+			parameters.options,
+			parameters.startStrings,
+			parameters.fudge,
+			parameters.prefix,
+			output
+		)
+	})
 })()
