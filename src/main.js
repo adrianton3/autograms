@@ -61,6 +61,8 @@
 
 		const optionAutogram = document.getElementById('option-autogram').checked
 
+		const countMax = document.getElementById('count-max').checked
+
 		const startStrings = (() => {
 			if (optionAutogram) {
 				return auto.languages[language].intros.flatMap((intro) =>
@@ -75,7 +77,10 @@
 
 		return {
 			language,
-			ordering: orderingAlphabetic ? 'alphabetic' : 'count',
+			options: {
+				ordering: orderingAlphabetic ? 'alphabetic' : 'count',
+				count: countMax ? 'max' : 'average',
+			},
 			fudge: fudgeStart,
 			prefix: null,
 			startStrings,
@@ -163,7 +168,7 @@
 
 		auto.runner.getInfo(
 			auto.languages[parameters.language].numerals,
-			parameters.ordering,
+			parameters.options,
 			parameters.startStrings,
 			parameters.fudge,
 			parameters.prefix,
@@ -172,7 +177,7 @@
 
 		auto.runner.runPartial(
 			auto.languages[parameters.language].numerals,
-			parameters.ordering,
+			parameters.options,
 			parameters.startStrings,
 			parameters.fudge,
 			2,
