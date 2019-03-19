@@ -101,10 +101,24 @@
 		return new Int8Array(sum.map((value) => Math.ceil(value / signatures.length)))
 	}
 
+	function getCountMedian (letters, signatures) {
+		const entries = new Array(letters.length).fill().map(() => [])
+
+		signatures.forEach((signature) => {
+			signature.forEach((value, index) => {
+				entries[index].push(value)
+			})
+		})
+
+		entries.forEach((values) => { values.sort() })
+
+		return new Int8Array(entries.map((values) => values[Math.floor(values.length / 2) + 1]))
+	}
+
 	function getCount (letters, signatures, count) {
-		return count === 'max'
-			? getCountMax(letters, signatures)
-			: getCountAverage(letters, signatures)
+		return count === 'max' ? getCountMax(letters, signatures)
+			: count === 'average' ? getCountAverage(letters, signatures)
+			: getCountMedian(letters, signatures)
 	}
 
 	function getCountNonLetters (letters, string) {
@@ -205,6 +219,11 @@
 
 		output('log', 'count average:')
 		output('log', countAverage)
+
+		const countMedian = getCountMedian(letters, signatures)
+
+		output('log', 'count median:')
+		output('log', countMedian)
 
 		const countStartMin = getCountMin(numerals, letters, startStrings)
 

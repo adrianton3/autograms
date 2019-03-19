@@ -62,6 +62,7 @@
 		const optionAutogram = document.getElementById('option-autogram').checked
 
 		const countMax = document.getElementById('count-max').checked
+		const countAverage = document.getElementById('count-average').checked
 
 		const startStrings = (() => {
 			if (optionAutogram) {
@@ -79,7 +80,7 @@
 			language,
 			options: {
 				ordering: orderingAlphabetic ? 'alphabetic' : 'count',
-				count: countMax ? 'max' : 'average',
+				count: countMax ? 'max' : countAverage ? 'average' : 'median',
 			},
 			fudge: fudgeStart,
 			prefix: null,
