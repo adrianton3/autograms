@@ -137,7 +137,7 @@
 					},
 				})
 			} else if (partialsIndex < partials.length) {
-				output('log', `max fudge ${message.fudge} for ${message.prefix}`)
+				output('log', `${message.prefix.join(' ')}:    max fudge ${message.fudge}    max time ${stringifyTime(message.time)}`)
 
 				postPartial()
 			}
