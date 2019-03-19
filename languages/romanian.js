@@ -11,6 +11,14 @@
 			'Următoarea frază este alcătuită din',
 			'Următoarea frază este formată din',
 
+			'Fraza următoare conține',
+			'Fraza următoare are',
+			'Fraza următoare include',
+			'Fraza următoare cuprinde',
+			'Fraza următoare înglobează',
+			'Fraza următoare este alcătuită din',
+			'Fraza următoare este formată din',
+
 			'Această frază conține',
 			'Această frază are',
 			'Această frază include',
@@ -19,7 +27,16 @@
 			'Această frază este alcătuită din',
 			'Această frază este formată din',
 
+			'Fraza aceasta conține',
+			'Fraza aceasta are',
+			'Fraza aceasta include',
+			'Fraza aceasta cuprinde',
+			'Fraza aceasta înglobează',
+			'Fraza aceasta este alcătuită din',
+			'Fraza aceasta este formată din',
+
 			'În alcătuirea aceastei fraze intră',
+			'În alcătuirea frazei aceasteia intră',
 
 			'În această frază se află',
 			'În această frază se găsesc',
@@ -27,6 +44,13 @@
 			'În această frază se numără',
 			'În această frază se pot observa',
 			'În această frază se observă',
+
+			'În fraza aceasta se află',
+			'În fraza aceasta se găsesc',
+			'În fraza aceasta se pot număra',
+			'În fraza aceasta se numără',
+			'În fraza aceasta se pot observa',
+			'În fraza aceasta se observă',
 		],
 		lastSeparators: [
 			'și',

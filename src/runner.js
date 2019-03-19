@@ -89,6 +89,38 @@
 		return max
 	}
 
+	function getCountAverage (letters, signatures) {
+		const sum = new Array(letters.length).fill(0)
+
+		signatures.forEach((signature) => {
+			signature.forEach((value, index) => {
+				sum[index] += value
+			})
+		})
+
+		return new Int8Array(sum.map((value) => Math.ceil(value / signatures.length)))
+	}
+
+	function getCountMedian (letters, signatures) {
+		const entries = new Array(letters.length).fill().map(() => [])
+
+		signatures.forEach((signature) => {
+			signature.forEach((value, index) => {
+				entries[index].push(value)
+			})
+		})
+
+		entries.forEach((values) => { values.sort() })
+
+		return new Int8Array(entries.map((values) => values[Math.floor(values.length / 2) + 1]))
+	}
+
+	function getCount (letters, signatures, count) {
+		return count === 'max' ? getCountMax(letters, signatures)
+			: count === 'average' ? getCountAverage(letters, signatures)
+			: getCountMedian(letters, signatures)
+	}
+
 	function getCountNonLetters (letters, string) {
 		const map = new Map
 
@@ -170,10 +202,10 @@
 		return max
 	}
 
-	function getInfo (numerals, ordering, startStrings, fudge, prefix, output) {
+	function getInfo (numerals, options, startStrings, fudge, prefix, output) {
 		output('log', `numerals ${numerals.length}`)
 
-		const letters = getLetters(numerals, ordering)
+		const letters = getLetters(numerals, options.ordering)
 		output('log', 'letters:')
 		output('log', letters.join(' '))
 
@@ -183,18 +215,28 @@
 		output('log', 'count max:')
 		output('log', countMax)
 
+		const countAverage = getCountAverage(letters, signatures)
+
+		output('log', 'count average:')
+		output('log', countAverage)
+
+		const countMedian = getCountMedian(letters, signatures)
+
+		output('log', 'count median:')
+		output('log', countMedian)
+
 		const countStartMin = getCountMin(numerals, letters, startStrings)
 
 		output('log', 'count start min:')
 		output('log', countStartMin)
 	}
 
-	function run (numerals, ordering, startStrings, fudge, prefix, output) {
-		const letters = getLetters(numerals, ordering)
+	function run (numerals, options, startStrings, fudge, prefix, output) {
+		const letters = getLetters(numerals, options.ordering)
 
 		const signatures = getSignatures(letters, numerals)
 		const indexMax = letters.length
-		const countMax = getCountMax(letters, signatures)
+		const countMax = getCount(letters, signatures, options.count)
 		const maxMax = numerals.length - 1
 
 		const countStartMin = getCountMin(numerals, letters, startStrings)
@@ -311,11 +353,11 @@
 		}
 	}
 
-	function runPartial (numerals, ordering, startStrings, _fudge, indexMax, output) {
-		const letters = getLetters(numerals, ordering)
+	function runPartial (numerals, options, startStrings, _fudge, indexMax, output) {
+		const letters = getLetters(numerals, options.ordering)
 
 		const signatures = getSignatures(letters, numerals)
-		const countMax = getCountMax(letters, signatures)
+		const countMax = getCount(letters, signatures, options.count)
 		const maxMax = numerals.length - 1
 
 		const countStartMin = getCountMin(numerals, letters, startStrings)
