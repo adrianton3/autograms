@@ -2,6 +2,7 @@
 	'use strict'
 
 	const romanian = {
+		alphabet: 'aăâbcdefghiîjklmnopqrsștțuvwxyz',
 		intros: [
 			'Următoarea frază conține',
 			'Următoarea frază are',
