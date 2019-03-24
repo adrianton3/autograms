@@ -165,6 +165,7 @@
 		partialsIndex = 0
 
 		auto.runner.getInfo(
+			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
 			parameters.options,
 			parameters.startStrings,
@@ -174,6 +175,7 @@
 		)
 
 		auto.runner.runPartial(
+			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
 			parameters.options,
 			parameters.startStrings,
@@ -212,6 +214,7 @@
 		parameters = getParameters()
 
 		auto.runner.getInfo(
+			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
 			parameters.options,
 			parameters.startStrings,

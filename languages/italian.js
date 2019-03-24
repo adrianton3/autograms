@@ -2,6 +2,7 @@
 	'use strict'
 
 	const italian = {
+		alphabet: 'abcdefghilmnopqrstuvz',
 		intros: [
 			'Questa frase contiene',
 		],

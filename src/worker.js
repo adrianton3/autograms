@@ -19,6 +19,7 @@
 			const startTime = performance.now()
 
 			auto.runner.run(
+				auto.languages[parameters.language].alphabet,
 				auto.languages[parameters.language].numerals,
 				parameters.options,
 				parameters.startStrings,
