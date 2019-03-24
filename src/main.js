@@ -55,8 +55,6 @@
 	function getParameters () {
 		const language = languageElement.value
 
-		const orderingAlphabetic = document.getElementById('ordering-alphabetic').checked
-
 		const fudgeStart = Number(fudgeStartElement.value)
 
 		const optionAutogram = document.getElementById('option-autogram').checked
@@ -79,7 +77,6 @@
 		return {
 			language,
 			options: {
-				ordering: orderingAlphabetic ? 'alphabetic' : 'count',
 				count: countMax ? 'max' : countAverage ? 'average' : 'median',
 			},
 			fudge: fudgeStart,
