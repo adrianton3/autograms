@@ -339,7 +339,11 @@
 					const signature = signatures[i]
 
 					for (let j = 0; j < indexMax; j++) {
-						restCandidate[j] = -(sum[j] + signature[j] + (i > 0 ? 1 : 0) - solution[j])
+						restCandidate[j] = -(sum[j] + signature[j] - solution[j])
+					}
+
+					if (i > 0) {
+						restCandidate[index]--
 					}
 
 					for (let j = 0; j < countStartRest.length; j++) {
