@@ -277,7 +277,7 @@
 			countStartMin,
 			countStartRest,
 			spanForIndex,
-		} = prepare(alphabet, numerals, options, startStrings, fudge)
+		} = prepare(alphabet, numerals, options, startStrings, 1000)
 
 		const indexMax = letters.length
 		const maxMax = numerals.length - 1
@@ -290,8 +290,8 @@
 		function bt (index) {
 			if (index < indexMax - 1) {
 				// find min from partial
-				const min = sum[index]
-				const max = Math.min(min + spanForIndex[index], maxMax)
+				const min = Math.max(Math.floor(sum[index] + spanForIndex[index] / 2) - fudge, 0)
+				const max = Math.min(Math.floor(sum[index] + spanForIndex[index] / 2) + fudge, maxMax)
 
 				for (let i = min; i <= max; i++) {
 					// apply partial
@@ -331,8 +331,8 @@
 					}
 				}
 			} else {
-				const min = sum[index]
-				const max = Math.min(min + spanForIndex[index],	maxMax)
+				const min = Math.max(Math.floor(sum[index] + spanForIndex[index] / 2) - fudge, 0)
+				const max = Math.min(Math.floor(sum[index] + spanForIndex[index] / 2) + fudge, maxMax)
 
 				for (let i = min; i <= max; i++) {
 					solution[index] = i
