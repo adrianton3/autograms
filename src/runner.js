@@ -293,7 +293,12 @@
 				const min = sum[index]
 				const max = Math.min(min + spanForIndex[index], maxMax)
 
-				for (let i = min; i <= max; i++) {
+				if (min === 0) {
+					solution[index] = 0
+					bt(index + 1)
+				}
+
+				for (let i = min === 0 ? 1 : min; i <= max; i++) {
 					// apply partial
 					solution[index] = i
 					const signature = signatures[i]
@@ -301,10 +306,7 @@
 						sum[j] += signature[j]
 					}
 
-					// apply itself
-					if (i > 0) {
-						sum[index]++
-					}
+					sum[index]++
 
 					// validate partial
 					let partial = true
@@ -326,9 +328,7 @@
 					}
 
 					// remove itself
-					if (i > 0) {
-						sum[index]--
-					}
+					sum[index]--
 				}
 			} else {
 				const min = sum[index]
