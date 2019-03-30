@@ -40,6 +40,9 @@
 	let partials = []
 	let partialsIndex = 0
 
+	let timeSum = 0
+	let timeCount = 0
+
 	const fudgeStartElement = document.getElementById('fudge-start')
 
 	fudgeStartElement.addEventListener('change', () => {
@@ -115,12 +118,16 @@
 
 		partialsIndexElement.textContent = `${partialsIndex}`
 
-		const estimatedTime = (partials.length - partialsIndex) * (fudgeTimeMin + cooldown) / Number(threadCountMaxElement.value)
+		const timeAverage = timeSum / timeCount
+		const estimatedTime = (partials.length - partialsIndex) * (timeAverage + cooldown) / Number(threadCountMaxElement.value)
 		estimatedTimeElement.textContent = stringifyTime(estimatedTime)
 	}
 
 	function handleMessage (message) {
 		if (message.type === 'end') {
+			timeCount++
+			timeSum += message.time
+
 			if (
 				message.fudge < parameters.fudge + 10 &&
 				message.time < fudgeTimeMin
