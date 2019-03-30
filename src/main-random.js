@@ -38,6 +38,9 @@
 	let partials = []
 	let partialsIndex = 0
 
+	let timeSum = 0
+	let timeCount = 0
+
 	function getParameters () {
 		const language = languageElement.value
 
@@ -101,12 +104,16 @@
 
 		partialsIndexElement.textContent = `${partialsIndex}`
 
-		const estimatedTime = (partials.length - partialsIndex) * cooldown / Number(threadCountMaxElement.value)
+		const timeAverage = timeSum / timeCount
+		const estimatedTime = (partials.length - partialsIndex) * (timeAverage + cooldown) / Number(threadCountMaxElement.value)
 		estimatedTimeElement.textContent = stringifyTime(estimatedTime)
 	}
 
 	function handleMessage (message) {
 		if (message.type === 'end') {
+			timeCount++
+			timeSum += message.time
+
 			output('log', `${message.prefix.join(' ')}:    max time ${stringifyTime(message.time)}`)
 			postPartial()
 		} else {
@@ -164,7 +171,7 @@
 
 		output('log', '\n=== partials')
 		output('log', `count ${partials.length}`)
-		output('log', `estimated min time ${stringifyTime(partials.length * cooldown)}`)
+		output('log', `estimated min time ${stringifyTime(partials.length * cooldown * 2)}`)
 
 		output('log', '\n=== searching')
 
