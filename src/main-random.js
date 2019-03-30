@@ -86,7 +86,7 @@
 
 	function postPartial () {
 		if (partialsIndex >= partials.length) {
-			return
+			partialsIndex = 0
 		}
 
 		pool.post({
@@ -107,11 +107,8 @@
 
 	function handleMessage (message) {
 		if (message.type === 'end') {
-			if (partialsIndex < partials.length) {
-				output('log', `${message.prefix.join(' ')}:    max time ${stringifyTime(message.time)}`)
-
-				postPartial()
-			}
+			output('log', `${message.prefix.join(' ')}:    max time ${stringifyTime(message.time)}`)
+			postPartial()
 		} else {
 			output(message.type, message.data)
 		}
