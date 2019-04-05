@@ -482,7 +482,7 @@
 			while (index < indexMax - 1) {
 				// find min from partial
 				const min = sum[index]
-				const i = Math.min(min + Math.floor(Math.random() * spanForIndex[index] + 1), maxMax)
+				const i = Math.min(min + Math.floor(Math.random() * (spanForIndex[index] + 1)), maxMax)
 
 				// apply partial
 				solution[index] = i
@@ -491,7 +491,9 @@
 					sum[j] += signature[j]
 				}
 
-				sum[index]++
+				if (i > 0) {
+					sum[index]++
+				}
 
 				index++
 			}
