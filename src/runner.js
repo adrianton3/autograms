@@ -498,6 +498,13 @@
 				index++
 			}
 
+			// validate partial
+			for (let j = 0; j < index; j++) {
+				if (sum[j] > solution[j]) {
+					return
+				}
+			}
+
 			const min = sum[index]
 			const max = Math.min(min + spanForIndex[index],	maxMax)
 
