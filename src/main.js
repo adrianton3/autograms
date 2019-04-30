@@ -65,6 +65,8 @@
 		const countMax = document.getElementById('count-max').checked
 		const countAverage = document.getElementById('count-average').checked
 
+		const prefixLength = Number(document.getElementById('prefix-length').value)
+
 		const startStrings = (() => {
 			if (optionAutogram) {
 				return auto.languages[language].intros.flatMap((intro) =>
@@ -85,6 +87,7 @@
 			fudge: fudgeStart,
 			prefix: null,
 			startStrings,
+			prefixLength,
 		}
 	}
 
@@ -187,7 +190,7 @@
 			parameters.options,
 			parameters.startStrings,
 			parameters.fudge,
-			2,
+			parameters.prefixLength,
 			(type, data) => {
 				// output('log', data.join(' '))
 				if (type === 'partial') {
