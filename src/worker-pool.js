@@ -18,9 +18,17 @@
 				let allBusy = true
 
 				for (let i = 0; i < size; i++) {
-					if (status[i] === 'idle') {
-						workers[i].postMessage(queue.shift())
-						status[i] = 'busy'
+					if (status[i].state === 'idle') {
+						const entry = queue.shift()
+
+						workers[i].postMessage(entry)
+
+						status[i] = {
+							state: 'busy',
+							prefix: entry.parameters.prefix,
+							fudge: entry.parameters.fudge,
+						}
+
 						allBusy = false
 						break
 					}
@@ -35,11 +43,11 @@
 		function makeMessageHandler (index) {
 			return ({ data }) => {
 				if (data.type === 'end') {
-					status[index] = 'cooldown'
+					status[index] = { state: 'cooldown' }
 					output({ type: 'status', data: status })
 
 					setTimeout(() => {
-						status[index] = 'idle'
+						status[index] = { state: 'idle' }
 						dispatch()
 						output({ type: 'status', data: status })
 					}, cooldown)
@@ -56,7 +64,7 @@
 			worker.addEventListener('message', makeMessageHandler(i))
 
 			workers.push(worker)
-			status.push('idle')
+			status.push({ state: 'idle' })
 		}
 
 		output({ type: 'status', data: status })
