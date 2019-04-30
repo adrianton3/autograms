@@ -198,6 +198,8 @@
 			}
 		)
 
+		partials.sort((a, b) => Math.max(...a) - Math.max(...b))
+
 		partialsCountElement.textContent = `${partials.length}`
 
 		output('log', '\n=== partials')
