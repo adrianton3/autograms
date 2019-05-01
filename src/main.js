@@ -206,7 +206,14 @@
 			}
 		)
 
-		partials.sort((a, b) => Math.max(...a) - Math.max(...b))
+		partials.sort((a, b) => {
+			const deltaMax = Math.max(...a) - Math.max(...b)
+			const deltaSum = a.reduce((sum, value) => sum + value) - b.reduce((sum, value) => sum + value)
+
+			return deltaMax === 0 ? deltaSum : deltaMax
+		})
+
+		console.log(partials.join('\n'))
 
 		partialsCountElement.textContent = `${partials.length}`
 
