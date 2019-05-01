@@ -21,7 +21,12 @@
 			console.log(data)
 			outSolutionsElement.value += `solution:\n${data}\n`
 		} else if (type === 'status') {
-			outStatusElement.value = data.map((status, index) => `thread ${index}: ${status}`).join('\n')
+			outStatusElement.value = data.map(
+				(status, index) =>
+					status.state === 'busy'
+						? `thread ${index}: ${status.state} [${status.prefix.join(' ')}] ${status.fudge}`
+						: `thread ${index}: ${status.state}`
+			).join('\n')
 		}
 	}
 
@@ -65,6 +70,8 @@
 		const countMax = document.getElementById('count-max').checked
 		const countAverage = document.getElementById('count-average').checked
 
+		const prefixLength = Number(document.getElementById('prefix-length').value)
+
 		const startStrings = (() => {
 			if (optionAutogram) {
 				return auto.languages[language].intros.flatMap((intro) =>
@@ -85,6 +92,7 @@
 			fudge: fudgeStart,
 			prefix: null,
 			startStrings,
+			prefixLength,
 		}
 	}
 
@@ -187,7 +195,7 @@
 			parameters.options,
 			parameters.startStrings,
 			parameters.fudge,
-			2,
+			parameters.prefixLength,
 			(type, data) => {
 				// output('log', data.join(' '))
 				if (type === 'partial') {
@@ -197,6 +205,15 @@
 				}
 			}
 		)
+
+		partials.sort((a, b) => {
+			const deltaMax = Math.max(...a) - Math.max(...b)
+			const deltaSum = a.reduce((sum, value) => sum + value) - b.reduce((sum, value) => sum + value)
+
+			return deltaMax === 0 ? deltaSum : deltaMax
+		})
+
+		console.log(partials.join('\n'))
 
 		partialsCountElement.textContent = `${partials.length}`
 
