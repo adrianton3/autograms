@@ -212,8 +212,6 @@
 			return deltaMax === 0 ? deltaSum : deltaMax
 		})
 
-		console.log(partials.join('\n'))
-
 		partialsCountElement.textContent = `${partials.length}`
 
 		output('log', '\n=== partials')
