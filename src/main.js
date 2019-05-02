@@ -14,12 +14,18 @@
 	const outSolutionsElement = document.getElementById('out-solutions')
 	const outStatusElement = document.getElementById('out-status')
 
+	const solutions = new Set
+
 	function output (type, data) {
 		if (type === 'log') {
 			outLogElement.value += `${data}\n`
 		} else if (type === 'solution') {
-			console.log(data)
-			outSolutionsElement.value += `solution: ${data}\ntime: ${stringifyTime(performance.now() - startTime)}\n`
+			if (!solutions.has(data)) {
+				solutions.add(data)
+
+				console.log(data)
+				outSolutionsElement.value += `solution: ${data}\ntime: ${stringifyTime(performance.now() - startTime)}\n`
+			}
 		} else if (type === 'status') {
 			outStatusElement.value = data.map(
 				(status, index) =>
