@@ -19,7 +19,7 @@
 			outLogElement.value += `${data}\n`
 		} else if (type === 'solution') {
 			console.log(data)
-			outSolutionsElement.value += `solution:\n${data}\n`
+			outSolutionsElement.value += `solution: ${data}\ntime: ${stringifyTime(performance.now() - startTime)}\n`
 		} else if (type === 'status') {
 			outStatusElement.value = data.map(
 				(status, index) =>
@@ -47,6 +47,8 @@
 
 	let timeSum = 0
 	let timeCount = 0
+
+	let startTime = 0
 
 	const fudgeStartElement = document.getElementById('fudge-start')
 
@@ -169,6 +171,8 @@
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
+		startTime = performance.now()
+
 		outLogElement.value = '=== info\n'
 
 		parameters = getParameters()
