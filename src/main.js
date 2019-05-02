@@ -148,9 +148,8 @@
 						prefix: message.prefix,
 					},
 				})
-			} else if (partialsIndex < partials.length) {
+			} else {
 				output('log', `${message.prefix.join(' ')}:    max fudge ${message.fudge}    max time ${stringifyTime(message.time)}`)
-
 				postPartial()
 			}
 		} else {
