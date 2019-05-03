@@ -3,7 +3,9 @@
 
 	self.auto = {}
 
-	importScripts('runner.js')
+	importScripts('runner/common.js')
+	importScripts('runner/brute.js')
+	importScripts('runner/random.js')
 
 	;[
 		'italian',
@@ -18,7 +20,7 @@
 
 			const startTime = performance.now()
 
-			auto.runner.run(
+			auto.runner.runBrute(
 				auto.languages[parameters.language].alphabet,
 				auto.languages[parameters.language].numerals,
 				parameters.options,
