@@ -21,7 +21,12 @@
 			console.log(data)
 			outSolutionsElement.value += `solution:\n${data}\n`
 		} else if (type === 'status') {
-			outStatusElement.value = data.map((status, index) => `thread ${index}: ${status}`).join('\n')
+			outStatusElement.value = data.map(
+				(status, index) =>
+					status.state === 'busy'
+						? `thread ${index}: ${status.state} [${status.prefix.join(' ')}]`
+						: `thread ${index}: ${status.state}`
+			).join('\n')
 		}
 	}
 
