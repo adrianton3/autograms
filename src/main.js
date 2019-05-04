@@ -14,12 +14,18 @@
 	const outSolutionsElement = document.getElementById('out-solutions')
 	const outStatusElement = document.getElementById('out-status')
 
+	const solutions = new Set
+
 	function output (type, data) {
 		if (type === 'log') {
 			outLogElement.value += `${data}\n`
 		} else if (type === 'solution') {
-			console.log(data)
-			outSolutionsElement.value += `solution:\n${data}\n`
+			if (!solutions.has(data)) {
+				solutions.add(data)
+
+				console.log(data)
+				outSolutionsElement.value += `solution: ${data}\ntime: ${stringifyTime(performance.now() - startTime)}\n`
+			}
 		} else if (type === 'status') {
 			outStatusElement.value = data.map(
 				(status, index) =>
@@ -47,6 +53,8 @@
 
 	let timeSum = 0
 	let timeCount = 0
+
+	let startTime = 0
 
 	const fudgeStartElement = document.getElementById('fudge-start')
 
@@ -148,9 +156,8 @@
 						prefix: message.prefix,
 					},
 				})
-			} else if (partialsIndex < partials.length) {
+			} else {
 				output('log', `${message.prefix.join(' ')}:    max fudge ${message.fudge}    max time ${stringifyTime(message.time)}`)
-
 				postPartial()
 			}
 		} else {
@@ -170,6 +177,8 @@
 	})
 
 	document.getElementById('run').addEventListener('click', () => {
+		startTime = performance.now()
+
 		outLogElement.value = '=== info\n'
 
 		parameters = getParameters()
@@ -212,8 +221,6 @@
 
 			return deltaMax === 0 ? deltaSum : deltaMax
 		})
-
-		console.log(partials.join('\n'))
 
 		partialsCountElement.textContent = `${partials.length}`
 
