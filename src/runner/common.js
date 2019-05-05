@@ -249,7 +249,7 @@
 		const countStartMin = getCountMin(numerals, letters, startStrings)
 
 		output('log', 'count start min:')
-		output('log', countStartMin)
+		output('log', countStartMin.join(' '))
 
 		const preMax = prepare(alphabet, numerals, { count: 'max' }, startStrings, fudge)
 
