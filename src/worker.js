@@ -10,6 +10,7 @@
 	;[
 		'italian',
 		'romanian',
+		'latin',
 	].forEach((language) => {
 		importScripts(`../languages/${language}.js`)
 	})
