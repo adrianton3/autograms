@@ -36,11 +36,8 @@
 		}
 	}
 
-	const cooldown = 500
-
 	const pool = auto.makePool(
 		Math.max(1, navigator.hardwareConcurrency - 1),
-		cooldown,
 		handleMessage,
 	)
 
@@ -135,7 +132,7 @@
 		partialsIndexElement.textContent = `${partialsIndex}`
 
 		const timeAverage = timeSum / timeCount
-		const estimatedTime = (partials.length - partialsIndex) * (timeAverage + cooldown) / Number(threadCountMaxElement.value)
+		const estimatedTime = (partials.length - partialsIndex) * (timeAverage + 500) / Number(threadCountMaxElement.value)
 		estimatedTimeElement.textContent = stringifyTime(estimatedTime)
 	}
 
@@ -237,7 +234,7 @@
 
 		output('log', '\n=== partials')
 		output('log', `count ${partials.length}`)
-		output('log', `estimated min time ${stringifyTime(partials.length * (fudgeTimeMin + cooldown))}`)
+		output('log', `estimated min time ${stringifyTime(partials.length * (fudgeTimeMin + 500))}`)
 
 		output('log', '\n=== searching')
 
