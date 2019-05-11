@@ -1,7 +1,7 @@
 (() => {
 	'use strict'
 
-	function makePool (sizeMax, cooldown, output) {
+	function makePool (sizeMax, output) {
 		let size = sizeMax
 
 		const queue = []
@@ -43,6 +43,8 @@
 		function makeMessageHandler (index) {
 			return ({ data }) => {
 				if (data.type === 'end') {
+					const cooldown = Math.max(4, Math.min(500, data.time / 2))
+
 					status[index] = { state: 'cooldown' }
 					output({ type: 'status', data: status })
 
@@ -51,7 +53,6 @@
 						dispatch()
 						output({ type: 'status', data: status })
 					}, cooldown)
-
 				}
 
 				output(data)
