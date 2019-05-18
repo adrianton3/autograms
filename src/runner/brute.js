@@ -3,6 +3,7 @@
 
 	const {
 		prepare,
+		inflate,
 	} = auto.runner
 
 	function runBrute (alphabet, numerals, options, startStrings, fudge, prefix, output) {
@@ -93,7 +94,10 @@
 						}
 
 						if (valid && solution.some(Boolean)) {
-							output('solution', solution.join(' '))
+							output('solution', {
+								count: solution.join(' '),
+								inflated: inflate(alphabet, letters, solution, numerals),
+							})
 						}
 					}
 				}

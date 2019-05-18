@@ -20,11 +20,11 @@
 		if (type === 'log') {
 			outLogElement.value += `${data}\n`
 		} else if (type === 'solution') {
-			if (!solutions.has(data)) {
-				solutions.add(data)
+			if (!solutions.has(data.count)) {
+				solutions.add(data.count)
 
-				console.log(data)
-				outSolutionsElement.value += `solution: ${data}\ntime: ${stringifyTime(performance.now() - startTime)}\n`
+				console.log(data.count)
+				outSolutionsElement.value += `solution: ${data.count}\ntime: ${stringifyTime(performance.now() - startTime)}\n"${data.inflated}"\n\n`
 			}
 		} else if (type === 'status') {
 			outStatusElement.value = data.map(
