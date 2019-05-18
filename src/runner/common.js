@@ -270,9 +270,20 @@
 		output('log', preMedian.spanForIndex.join(' '))
 	}
 
+	function inflate (alphabet, letters, count, numerals) {
+		return [...alphabet].filter((letter) => letters.includes(letter))
+			.map((letter) => {
+				const index = letters.indexOf(letter)
+				return numerals[count[index]].replace(/@/g, letter)
+			})
+			.filter((element) => element.length > 0)
+			.join(', ')
+	}
+
 	auto.runner = auto.runner || {}
 	Object.assign(auto.runner, {
 		getInfo,
 		prepare,
+		inflate,
 	})
 })()
