@@ -1,40 +1,13 @@
 (() => {
 	'use strict'
 
-	const languageElement = document.getElementById('language')
-
-	Object.keys(auto.languages).forEach((language) => {
-		const option = document.createElement('option')
-		option.textContent = language
-
-		languageElement.appendChild(option)
+	const ui = new auto.Ui({
+		languages: auto.languages,
+		handleFudgeTimeChange,
+		handleThreadCountChange,
+		handleRun,
+		handleInfo,
 	})
-
-	const outLogElement = document.getElementById('out-log')
-	const outSolutionsElement = document.getElementById('out-solutions')
-	const outStatusElement = document.getElementById('out-status')
-
-	const solutions = new Set
-
-	function output (type, data) {
-		if (type === 'log') {
-			outLogElement.value += `${data}\n`
-		} else if (type === 'solution') {
-			if (!solutions.has(data.count)) {
-				solutions.add(data.count)
-
-				console.log(data.count)
-				outSolutionsElement.value += `solution: ${data.count}\ntime: ${stringifyTime(performance.now() - startTime)}\n"${data.inflated}"\n\n`
-			}
-		} else if (type === 'status') {
-			outStatusElement.value = data.map(
-				(status, index) =>
-					status.state === 'busy'
-						? `thread ${index}: ${status.state} [${status.prefix.join(' ')}] ${status.fudge}`
-						: `thread ${index}: ${status.state}`
-			).join('\n')
-		}
-	}
 
 	const pool = auto.makePool(
 		Math.max(1, navigator.hardwareConcurrency - 1),
@@ -53,66 +26,22 @@
 
 	let startTime = 0
 
-	const fudgeStartElement = document.getElementById('fudge-start')
+	const solutions = new Set
 
-	fudgeStartElement.addEventListener('change', () => {
-		parameters.fudge = Number(fudgeStartElement.value)
-	})
+	function output (type, data) {
+		if (type === 'log') {
+			ui.postLog(data)
+		} else if (type === 'solution') {
+			if (!solutions.has(data.count)) {
+				solutions.add(data.count)
 
-	const fudgeTimeMinElement = document.getElementById('fudge-time-min')
-
-	fudgeTimeMinElement.addEventListener('change', () => {
-		fudgeTimeMin = Number(fudgeTimeMinElement.value) * 1000
-	})
-
-	function getParameters () {
-		const language = languageElement.value
-
-		const fudgeStart = Number(fudgeStartElement.value)
-
-		const optionAutogram = document.getElementById('option-autogram').checked
-
-		const countMax = document.getElementById('count-max').checked
-		const countAverage = document.getElementById('count-average').checked
-
-		const prefixLength = Number(document.getElementById('prefix-length').value)
-
-		const startStrings = (() => {
-			if (optionAutogram) {
-				return auto.languages[language].intros.flatMap((intro) =>
-					auto.languages[language].lastSeparators.map((lastSeparator) =>
-						`${intro} ${lastSeparator}`
-					)
-				)
+				console.log(data.count)
+				ui.postSolution(data.count, data.inflated, performance.now() - startTime)
 			}
-
-			return ['']
-		})()
-
-		return {
-			language,
-			options: {
-				count: countMax ? 'max' : countAverage ? 'average' : 'median',
-			},
-			fudge: fudgeStart,
-			prefix: null,
-			startStrings,
-			prefixLength,
+		} else if (type === 'status') {
+			ui.postThreads(data)
 		}
 	}
-
-	function stringifyTime (ms) {
-		return ms >= 1000 * 60 * 60 ? `${(ms / (1000 * 60 * 60)).toFixed(1)} h`
-			: ms >= 1000 * 60 ? `${(ms / (1000 * 60)).toFixed(1)} m`
-			: ms >= 1000 ? `${(ms / 1000).toFixed(1)} s`
-			: `${ms.toFixed(1)} ms`
-	}
-
-	const threadCountMaxElement = document.getElementById('thread-count-max')
-
-	const partialsIndexElement = document.getElementById('partials-index')
-	const partialsCountElement = document.getElementById('partials-count')
-	const estimatedTimeElement = document.getElementById('estimated-time')
 
 	function postPartial () {
 		if (partialsIndex >= partials.length) {
@@ -129,11 +58,11 @@
 
 		partialsIndex++
 
-		partialsIndexElement.textContent = `${partialsIndex}`
+		ui.setPartialsIndex(partialsIndex)
 
 		const timeAverage = timeSum / timeCount
-		const estimatedTime = (partials.length - partialsIndex) * (timeAverage + 500) / Number(threadCountMaxElement.value)
-		estimatedTimeElement.textContent = stringifyTime(estimatedTime)
+		const estimatedTime = (partials.length - partialsIndex) * (timeAverage + 500) / ui.getRuntimeParameters().threadCountMax
+		ui.setEstimatedTime(estimatedTime)
 	}
 
 	function handleMessage (message) {
@@ -154,7 +83,7 @@
 					},
 				})
 			} else {
-				output('log', `${message.prefix.join(' ')}:    max fudge ${message.fudge}    max time ${stringifyTime(message.time)}`)
+				output('log', `${message.prefix.join(' ')}:    max fudge ${message.fudge}    max time ${auto.stringifyTime(message.time)}`)
 				postPartial()
 			}
 		} else {
@@ -162,25 +91,28 @@
 		}
 	}
 
-	threadCountMaxElement.addEventListener('change', () => {
+	function handleFudgeTimeChange (fudgeTimeMinNew) {
+		fudgeTimeMin = fudgeTimeMinNew
+	}
+
+	function handleThreadCountChange (poolSizeNew) {
 		const poolSizeOld = pool.getSize()
-		const poolSizeNew = Number(threadCountMaxElement.value)
 
 		pool.setSize(poolSizeNew)
 
 		for (let i = poolSizeOld; i < poolSizeNew; i++) {
 			postPartial()
 		}
-	})
+	}
 
-	document.getElementById('run').addEventListener('click', () => {
+	function handleRun () {
 		startTime = performance.now()
 
-		outLogElement.value = '=== info\n'
+		ui.clear()
+		ui.lock()
 
-		parameters = getParameters()
-
-		fudgeTimeMin = Number(fudgeTimeMinElement.value) * 1000
+		parameters = ui.getParameters()
+		fudgeTimeMin = ui.getRuntimeParameters().fudgeTimeMin
 
 		partials = []
 		partialsIndex = 0
@@ -192,7 +124,7 @@
 			parameters.startStrings,
 			parameters.fudge,
 			parameters.prefix,
-			output
+			output,
 		)
 
 		auto.runner.runPartial(
@@ -203,7 +135,6 @@
 			parameters.fudge,
 			parameters.prefixLength,
 			(type, data) => {
-				// output('log', data.join(' '))
 				if (type === 'partial') {
 					partials.push(data)
 				} else {
@@ -230,27 +161,27 @@
 			return 0
 		})
 
-		partialsCountElement.textContent = `${partials.length}`
+		ui.setPartialsCount(partials.length)
 
 		output('log', '\n=== partials')
 		output('log', `count ${partials.length}`)
-		output('log', `estimated min time ${stringifyTime(partials.length * (fudgeTimeMin + 500))}`)
+		output('log', `estimated min time ${auto.stringifyTime(partials.length * (fudgeTimeMin + 500))}`)
 
 		output('log', '\n=== searching')
 
-		const poolSize = Number(threadCountMaxElement.value)
+		const poolSize = ui.getRuntimeParameters().threadCountMax
 
 		pool.setSize(poolSize)
 
 		for (let i = 0; i < poolSize; i++) {
 			postPartial()
 		}
-	})
+	}
 
-	document.getElementById('info').addEventListener('click', () => {
-		outLogElement.value = '=== info\n'
+	function handleInfo () {
+		ui.clear()
 
-		parameters = getParameters()
+		parameters = ui.getParameters()
 
 		auto.runner.getInfo(
 			auto.languages[parameters.language].alphabet,
@@ -259,7 +190,7 @@
 			parameters.startStrings,
 			parameters.fudge,
 			parameters.prefix,
-			output
+			output,
 		)
-	})
+	}
 })()
