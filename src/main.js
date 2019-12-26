@@ -9,6 +9,13 @@
 		handleInfo,
 	})
 
+	{
+		const savedState = auto.persist.load()
+		if (savedState != null) {
+			ui.setState(savedState)
+		}
+	}
+
 	const pool = auto.makePool(navigator.hardwareConcurrency, handleMessage)
 
 	let parameters = {}
@@ -75,7 +82,7 @@
 					: message.time < (fudgeTimeMin * .1) ? 2
 					: 1
 
-				const fudgeNext = Math.min(parameters.fudge + 10, message.fudge + fudgeIncrement)
+                const fudgeNext = Math.min(parameters.fudge + 10, message.fudge + fudgeIncrement)
 
 				pool.post({
 					type: 'solve',
@@ -113,6 +120,7 @@
 
 		ui.clear()
 		ui.lock()
+		auto.persist.save(ui.getState())
 
 		parameters = ui.getParameters()
 		fudgeTimeMin = ui.getRuntimeParameters().fudgeTimeMin

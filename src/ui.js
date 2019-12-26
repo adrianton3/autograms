@@ -81,6 +81,42 @@
 		}
     }
 
+    {
+        const keysToSave = [
+            'language',
+            'optionAutogram',
+            'optionReflexicon',
+            'prefixLength',
+            'fudgeStart',
+            'fudgeTimeMin',
+            'threadCountMax',
+        ]
+
+        Ui.prototype.getState = function () {
+            const state = {}
+
+            keysToSave.forEach((key) => {
+                const element = this.elements[key]
+
+                state[key] = element.type === 'radio' ? element.checked : element.value
+            })
+
+            return state
+        }
+
+        Ui.prototype.setState = function (state) {
+            keysToSave.forEach((key) => {
+                const element = this.elements[key]
+
+                if (element.type === 'radio') {
+                    element.checked = state[key]
+                } else {
+                    element.value = state[key]
+                }
+            })
+        }
+    }
+
     function setLock (elements, value) {
         elements.language.disabled = value
 
