@@ -24,19 +24,25 @@
             height: 50px;
         }
 
+        input[type="number"] {
+            width: 40px;
+        }
+
+        button {
+            width: 64px;
+        }
+
         #partials-count,#partials-index,#estimated-time {
-            background-color: hsl(0, 0%, 90%);
+            background-color: hsl(0, 0%, 95%);
             font-family: monospace;
             margin-left: 3px;
             margin-right: 3px;
-            padding: 2px;
+            padding: 0px 4px;
+            border: 1px solid hsl(0, 0%, 80%);
         }
     </style>
 </head>
 <body>
-    <datalist id="intros"></datalist>
-    <datalist id="last-separators"></datalist>
-
     <div>
         <label for="language">Language</label> <select id="language"></select>
     </div>
@@ -48,16 +54,16 @@
     </div>
 
     <div>
-        <label for="fudge-start">Fudge start</label> <input id="fudge-start" type="number" value="8" min="2" max="30">
-        <label for="fudge-time-min">Min time (s)</label> <input id="fudge-time-min" type="number" value="30" min="0" max="3600">
-    </div>
-
-    <div>
         <label for="prefix-length">Prefix length</label> <input id="prefix-length" type="number" value="2" min="1" max="4">
     </div>
 
     <div>
+        <label for="fudge-start">Fudge start</label> <input id="fudge-start" type="number" value="8" min="2" max="30">
+    </div>
+
+    <div>
         <label for="thread-count-max">Thread count max</label> <input id="thread-count-max" type="number" value="2" min="1" max="32">
+        <label for="fudge-time-min" title="Increase fudge until iteration exceeds this amount of time">Min time (s)</label> <input id="fudge-time-min" type="number" value="30" min="0" max="3600">
     </div>
 
     <div>
