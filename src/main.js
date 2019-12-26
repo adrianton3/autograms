@@ -9,10 +9,7 @@
 		handleInfo,
 	})
 
-	const pool = auto.makePool(
-		Math.max(1, navigator.hardwareConcurrency - 1),
-		handleMessage,
-	)
+	const pool = auto.makePool(navigator.hardwareConcurrency, handleMessage)
 
 	let parameters = {}
 
