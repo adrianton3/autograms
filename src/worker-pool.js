@@ -1,91 +1,94 @@
 (() => {
-	'use strict'
+    'use strict'
 
-	function makePool (sizeMax, output) {
-		let size = sizeMax
+    function makePool (sizeMax, output) {
+        let size = sizeMax
 
-		const queue = []
+        const queue = []
 
-		const workers = []
-		const status = []
+        const workers = []
+        const status = []
 
-		function dispatch () {
-			if (queue.length <= 0) {
-				return
-			}
+        function dispatch () {
+            if (queue.length <= 0) {
+                return
+            }
 
-			while (queue.length > 0) {
-				let allBusy = true
+            while (queue.length > 0) {
+                let allBusy = true
 
-				for (let i = 0; i < size; i++) {
-					if (status[i].state === 'idle') {
-						const entry = queue.shift()
+                for (let i = 0; i < size; i++) {
+                    if (status[i].state === 'idle') {
+                        const entry = queue.shift()
 
-						workers[i].postMessage(entry)
+                        workers[i].postMessage(entry)
 
-						status[i] = {
-							state: 'busy',
-							prefix: entry.parameters.prefix,
-							fudge: entry.parameters.fudge,
-						}
+                        status[i] = {
+                            state: 'busy',
+                            prefix: entry.parameters.prefix,
+                            fudge: entry.parameters.fudge,
+                        }
 
-						allBusy = false
-						break
-					}
-				}
+                        allBusy = false
+                        break
+                    }
+                }
 
-				if (allBusy) {
-					break
-				}
-			}
-		}
+                if (allBusy) {
+                    break
+                }
+            }
+        }
 
-		function makeMessageHandler (index) {
-			return ({ data }) => {
-				if (data.type === 'end') {
-					const cooldown = Math.max(4, Math.min(500, data.time / 2))
+        function makeMessageHandler (index) {
+            const next = () => {
+                status[index] = { state: 'idle' }
+                dispatch()
+                output({ type: 'status', data: status })
+            }
 
-					status[index] = { state: 'cooldown' }
-					output({ type: 'status', data: status })
+            return ({ data }) => {
+                if (data.type === 'end') {
+                    if (data.time < 50) {
+                        next()
+                    } else {
+                        status[index] = { state: 'cooldown' }
+                        output({ type: 'status', data: status })
+                        setTimeout(next, Math.min(500, data.time / 2))
+                    }
+                }
 
-					setTimeout(() => {
-						status[index] = { state: 'idle' }
-						dispatch()
-						output({ type: 'status', data: status })
-					}, cooldown)
-				}
+                output(data)
+            }
+        }
 
-				output(data)
-			}
-		}
+        for (let i = 0; i < sizeMax; i++) {
+            const worker = new Worker('src/worker.js')
 
-		for (let i = 0; i < sizeMax; i++) {
-			const worker = new Worker('src/worker.js')
+            worker.addEventListener('message', makeMessageHandler(i))
 
-			worker.addEventListener('message', makeMessageHandler(i))
+            workers.push(worker)
+            status.push({ state: 'idle' })
+        }
 
-			workers.push(worker)
-			status.push({ state: 'idle' })
-		}
+        output({ type: 'status', data: status })
 
-		output({ type: 'status', data: status })
+        return {
+            post (message) {
+                queue.push(message)
+                dispatch()
+                output({ type: 'status', data: status })
+            },
+            getSize () {
+                return size
+            },
+            setSize (newSize) {
+                size = Math.min(sizeMax, newSize)
+            }
+        }
+    }
 
-		return {
-			post (message) {
-				queue.push(message)
-				dispatch()
-				output({ type: 'status', data: status })
-			},
-			getSize () {
-				return size
-			},
-			setSize (newSize) {
-				size = Math.min(sizeMax, newSize)
-			}
-		}
-	}
-	
-	Object.assign(auto, {
-		makePool,
-	})
+    Object.assign(auto, {
+        makePool,
+    })
 })()
