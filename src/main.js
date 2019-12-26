@@ -71,11 +71,17 @@
 				message.fudge < parameters.fudge + 10 &&
 				message.time < fudgeTimeMin
 			) {
+				const fudgeIncrement = message.time < (fudgeTimeMin * .01) ? 3
+					: message.time < (fudgeTimeMin * .1) ? 2
+					: 1
+
+				const fudgeNext = Math.min(parameters.fudge + 10, message.fudge + fudgeIncrement)
+
 				pool.post({
 					type: 'solve',
 					parameters: {
 						...parameters,
-						fudge: message.fudge + 1,
+						fudge: fudgeNext,
 						prefix: message.prefix,
 					},
 				})
