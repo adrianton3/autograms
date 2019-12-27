@@ -256,18 +256,6 @@
 		output('log', 'sorted max:')
 		output('log', preMax.letters.join(' '))
 		output('log', preMax.spanForIndex.join(' '))
-
-		const preAverage = prepare(alphabet, numerals, { count: 'average' }, startStrings, fudge)
-
-		output('log', 'sorted average:')
-		output('log', preAverage.letters.join(' '))
-		output('log', preAverage.spanForIndex.join(' '))
-
-		const preMedian = prepare(alphabet, numerals, { count: 'median' }, startStrings, fudge)
-
-		output('log', 'sorted median:')
-		output('log', preMedian.letters.join(' '))
-		output('log', preMedian.spanForIndex.join(' '))
 	}
 
 	function inflate (alphabet, letters, count, numerals) {
