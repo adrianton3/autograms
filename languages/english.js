@@ -54,8 +54,12 @@
 		],
 	}
 
-	auto.languages = auto.languages || {}
-	Object.assign(auto.languages, {
-		english,
-	})
+	if (typeof window === 'undefined' && typeof WorkerGlobalScope === 'undefined') {
+		Object.assign(module.exports, english)
+	} else {
+		auto.languages = auto.languages || {}
+		Object.assign(auto.languages, {
+			english,
+		})
+	}
 })()

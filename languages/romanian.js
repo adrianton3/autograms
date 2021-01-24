@@ -195,8 +195,12 @@
 		],
 	}
 
-	auto.languages = auto.languages || {}
-	Object.assign(auto.languages, {
-		romanian,
-	})
+	if (typeof window === 'undefined' && typeof WorkerGlobalScope === 'undefined') {
+		Object.assign(module.exports, romanian)
+	} else {
+		auto.languages = auto.languages || {}
+		Object.assign(auto.languages, {
+			romanian,
+		})
+	}
 })()
