@@ -268,10 +268,18 @@
 			.join(', ')
 	}
 
-	auto.runner = auto.runner || {}
-	Object.assign(auto.runner, {
-		getInfo,
-		prepare,
-		inflate,
-	})
+	if (typeof window === 'undefined' && typeof WorkerGlobalScope === 'undefined') {
+		Object.assign(module.exports, {
+			getInfo,
+			prepare,
+			inflate,
+		})
+	} else {
+		auto.runner = auto.runner || {}
+		Object.assign(auto.runner, {
+			getInfo,
+			prepare,
+			inflate,
+		})
+	}
 })()
