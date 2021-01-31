@@ -9,8 +9,17 @@ const {
     generateCommon,
     generateBrute,
     generatePartial,
-    generateMain,
 } = require('./src/generator')
+
+function expand (source, map) {
+    return source.replace(/\/\*\$(\w+)\*\//g, (match, name) => {
+        if (map.hasOwnProperty(name)) {
+            return map[name]
+        } else {
+            return match
+        }
+    })
+}
 
 const languages = {
     english: require('./languages/english'),
@@ -25,6 +34,8 @@ const parameters = {
     options: { count: 'max' },
     startStrings: [''],
     fudge: process.argv.length > 3 ? Number(process.argv[3]) : 11,
+    prefixLength: 5,
+    threadCount: os.cpus().length,
 }
 
 const common = generateCommon(
@@ -32,6 +43,7 @@ const common = generateCommon(
     languages[parameters.language].numerals,
     parameters.options,
     parameters.startStrings,
+    parameters.fudge,
 )
 
 const brute = generateBrute(
@@ -47,21 +59,20 @@ const partial = generatePartial(
     languages[parameters.language].numerals,
     parameters.options,
     parameters.startStrings,
+    parameters.fudge,
+    parameters.prefixLength,
 )
 
-const main = generateMain({
-    prefixLength: 5,
-    threadCount: os.cpus().length,
+const template = fs.readFileSync(path.join(__dirname, 'static/template.cpp'), 'utf-8')
+
+const source = expand(template, {
+    prefixLength: parameters.prefixLength,
+    common,
+    brute,
+    partial,
+    threadCount: parameters.threadCount,
 })
 
-const parts = [
-    fs.readFileSync(path.join(__dirname, 'static/part-1.cpp'), 'utf-8'),
-    fs.readFileSync(path.join(__dirname, 'static/part-2.cpp'), 'utf-8'),
-]
-
-fs.writeFileSync(
-    path.join(__dirname, 'runner.cpp'),
-    [parts[0], common, brute, partial, parts[1], main].join(`\n\n// ${'='.repeat(76)}\n\n`),
-)
+fs.writeFileSync(path.join(__dirname, 'runner.cpp'), source)
 
 execFileSync('clang++', ['./runner.cpp', '-std=c++17', '-O3'])

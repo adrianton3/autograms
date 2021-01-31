@@ -42,15 +42,16 @@ function generateBrute (alphabet, numerals, options, startStrings, fudge) {
 	const indexMax = letters.length
 	const maxMax = numerals.length - 1
 
-	push(`void runBrute (const std::vector<int>& prefix = {}) {`)
+	push(`template<typename T>`)
+	push(`void runBrute (const T& prefix) {`)
 
-	push(`	const std::array<std::array<int, ${countStartRest[0].length}>, ${countStartRest.length}> countStartRest {{`)
+	push(`constexpr std::array<std::array<int, ${countStartRest[0].length}>, ${countStartRest.length}> countStartRest {{`)
 
-	countStartRest.forEach((entry) => { push(`		{ ${entry.join(', ')} }, `) })
+	countStartRest.forEach((entry) => { push(`	{ ${entry.join(', ')} }, `) })
 
 	push(`	}};`)
 
-	push(`	const std::array<int, ${spanForIndex.length}> spanForIndex { ${spanForIndex.join(', ')} };`)
+	push(`	constexpr std::array<int, ${spanForIndex.length}> spanForIndex { ${spanForIndex.join(', ')} };`)
 
 	push(
 		`	std::array<int, ${indexMax}> solution;`,
@@ -63,15 +64,16 @@ function generateBrute (alphabet, numerals, options, startStrings, fudge) {
 		`	std::function<void(int)> bt = [&] (auto index) {`,
 		`		if (index < ${indexMax - 1}) {`,
 		`			// find min from partial`,
-		`			const auto min = sum[index];`,
+		`			auto min = sum[index];`,
 		`			const auto max = std::min(min + spanForIndex[index], ${maxMax});`,
 		``,
 		`			if (min == 0) {`,
 		`				solution[index] = 0;`,
 		`				bt(index + 1);`,
+		`				min = 1;`,
 		`			}`,
 		``,
-		`			for (auto i = min == 0 ? 1 : min; i <= max; i++) {`,
+		`			for (auto i = min; i <= max; i++) {`,
 		`				// apply partial`,
 		`				solution[index] = i;`,
 		`				const auto& signature = signatures[i];`,
@@ -119,19 +121,41 @@ function generateBrute (alphabet, numerals, options, startStrings, fudge) {
 		`					restCandidate[index]--;`,
 		`				}`,
 		``,
-		`				for (const auto& rest : countStartRest) {`,
-		`					bool valid = true;`,
-		`					for (auto k = 0; k < ${indexMax}; k++) {`,
-		`						if (rest[k] != restCandidate[k]) {`,
-		`							valid = false;`,
-		`							break;`,
-		`						}`,
-		`					}`,
-		``,
-		`					if (valid) {`,
-		`						outputComplete(solution);`,
-		`					}`,
-		`				}`,
+	)
+
+	if (countStartRest.length === 1 && countStartRest[0].every((count) => count === 0)) {
+		push(
+			`				bool valid = true;`,
+			`				for (auto k = 0; k < ${indexMax}; k++) {`,
+			`					if (restCandidate[k] != 0) {`,
+			`						valid = false;`,
+			`						break;`,
+			`					}`,
+			`				}`,
+			``,
+			`				if (valid) {`,
+			`					outputComplete(solution);`,
+			`				}`,
+		)
+	} else {
+		push(
+			`				for (const auto& rest : countStartRest) {`,
+			`					bool valid = true;`,
+			`					for (auto k = 0; k < ${indexMax}; k++) {`,
+			`						if (rest[k] != restCandidate[k]) {`,
+			`							valid = false;`,
+			`							break;`,
+			`						}`,
+			`					}`,
+			``,
+			`					if (valid) {`,
+			`						outputComplete(solution);`,
+			`					}`,
+			`				}`,
+		)
+	}
+
+	push(
 		`			}`,
 		`		}`,
 		`	};`,
@@ -143,13 +167,13 @@ function generateBrute (alphabet, numerals, options, startStrings, fudge) {
 		`		for (auto index = 0; index < prefix.size(); index++) {`,
 		`			// apply partial`,
 		`			solution[index] = prefix[index];`,
-		`			const auto& signature = signatures[solution[index]];`,
+		`			const auto& signature = signatures[prefix[index]];`,
 		`			for (auto j = 0; j < ${indexMax}; j++) {`,
 		`				sum[j] += signature[j];`,
 		`			}`,
 		``,
 		`			// apply itself`,
-		`			if (solution[index] > 0) {`,
+		`			if (prefix[index] > 0) {`,
 		`				sum[index]++;`,
 		`			}`,
 		`		}`,
@@ -167,26 +191,26 @@ function generateBrute (alphabet, numerals, options, startStrings, fudge) {
 	return stringify()
 }
 
-function generatePartial (alphabet, numerals, options, startStrings) {
+function generatePartial (alphabet, numerals, options, startStrings, fudge) {
 	const { push, stringify } = makeLinesAccumulator()
 
-	const {	spanForIndex } = prepare(alphabet, numerals, options, startStrings, 1000)
+	const {	spanForIndex } = prepare(alphabet, numerals, options, startStrings, fudge)
 
 	const maxMax = numerals.length - 1
 
-	push(`void runPartial (int indexMax) {`)
+	push(`void runPartial () {`)
 
-	push(`	const std::array<int, ${spanForIndex.length}> spanForIndex { ${spanForIndex.join(', ')} };`)
+	push(`	constexpr std::array<int, ${spanForIndex.length}> spanForIndex { ${spanForIndex.join(', ')} };`)
 
 	push(
-		`	std::vector<int> solution (indexMax);`,
+		`	std::array<int, prefixLength> solution;`,
 		`	auto sum = countStartMin;`,
 		``,
 	)
 
 	push(
 		`	std::function<void(int)> bt = [&] (auto index) {`,
-		`		if (index < indexMax - 1) {`,
+		`		if (index < prefixLength - 1) {`,
 		`			// find min from partial`,
 		`			const auto min = sum[index];`,
 		`			const auto max = std::min(min + spanForIndex[index], ${maxMax});`,
@@ -195,7 +219,7 @@ function generatePartial (alphabet, numerals, options, startStrings) {
 		`				// apply partial`,
 		`				solution[index] = i;`,
 		`				const auto& signature = signatures[i];`,
-		`				for (auto j = 0; j < indexMax; j++) {`,
+		`				for (auto j = 0; j < prefixLength; j++) {`,
 		`					sum[j] += signature[j];`,
 		`				}`,
 		``,
@@ -219,7 +243,7 @@ function generatePartial (alphabet, numerals, options, startStrings) {
 		`				}`,
 		``,
 		`				// remove partial`,
-		`				for (auto j = 0; j < indexMax; j++) {`,
+		`				for (auto j = 0; j < prefixLength; j++) {`,
 		`					sum[j] -= signature[j];`,
 		`				}`,
 		``,
@@ -247,23 +271,8 @@ function generatePartial (alphabet, numerals, options, startStrings) {
 	return stringify()
 }
 
-function generateMain ({ prefixLength, threadCount }) {
-	const { push, stringify } = makeLinesAccumulator()
-
-	push(
-		`int main () {`,
-			`runPartial(${prefixLength});`,
-			`distribute(${threadCount});`,
-			`return 0;`,
-		`}`,
-	)
-
-	return stringify()
-}
-
 Object.assign(module.exports, {
 	generateCommon,
 	generateBrute,
 	generatePartial,
-	generateMain,
 })
