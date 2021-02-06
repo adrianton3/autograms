@@ -26,11 +26,10 @@
 			auto.runner.runBrute(
 				auto.languages[parameters.language].alphabet,
 				auto.languages[parameters.language].numerals,
-				parameters.options,
 				parameters.startStrings,
 				parameters.fudge,
 				parameters.prefix,
-				(type, data) => { postMessage({ type, data }) },
+				(data) => { postMessage({ type: 'solution', data }) },
 			)
 
 			const endTime = performance.now()
@@ -49,7 +48,6 @@
 			auto.runner.runRandom(
 				auto.languages[parameters.language].alphabet,
 				auto.languages[parameters.language].numerals,
-				parameters.options,
 				parameters.startStrings,
 				parameters.triesMax,
 				parameters.prefix,

@@ -31,9 +31,8 @@ const languages = {
 
 const parameters = {
     language: process.argv.length > 2 ? process.argv[2] : 'romanian',
-    options: { count: 'max' },
     startStrings: [''],
-    fudge: process.argv.length > 3 ? Number(process.argv[3]) : 11,
+    fudge: process.argv.length > 3 ? Number(process.argv[3]) : 10,
     prefixLength: 5,
     threadCount: os.cpus().length,
 }
@@ -41,7 +40,6 @@ const parameters = {
 const common = generateCommon(
     languages[parameters.language].alphabet,
     languages[parameters.language].numerals,
-    parameters.options,
     parameters.startStrings,
     parameters.fudge,
 )
@@ -49,7 +47,6 @@ const common = generateCommon(
 const brute = generateBrute(
     languages[parameters.language].alphabet,
     languages[parameters.language].numerals,
-    parameters.options,
     parameters.startStrings,
     parameters.fudge,
 )
@@ -57,13 +54,12 @@ const brute = generateBrute(
 const partial = generatePartial(
     languages[parameters.language].alphabet,
     languages[parameters.language].numerals,
-    parameters.options,
     parameters.startStrings,
     parameters.fudge,
     parameters.prefixLength,
 )
 
-const template = fs.readFileSync(path.join(__dirname, 'static/template.cpp'), 'utf-8')
+const template = fs.readFileSync(path.join(__dirname, 'static/template-multi.cpp'), 'utf-8')
 
 const source = expand(template, {
     prefixLength: parameters.prefixLength,

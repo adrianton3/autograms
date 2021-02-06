@@ -5,14 +5,14 @@
 		prepare,
 	} = auto.runner
 
-	function runRandom (alphabet, numerals, options, startStrings, triesMax, prefix, output) {
+	function runRandom (alphabet, numerals, startStrings, triesMax, prefix, output) {
 		const {
 			letters,
 			signatures,
 			countStartMin,
 			countStartRest,
 			spanForIndex,
-		} = prepare(alphabet, numerals, options, startStrings, 1000)
+		} = prepare(alphabet, numerals, startStrings, 1000)
 
 		const indexMax = letters.length
 		const maxMax = numerals.length - 1
@@ -111,14 +111,13 @@
 					sum[index]++
 				}
 			}
-
-			walkBatch(prefix.length)
 		}
 
-		if (prefix != null) {
-			setPrefix(prefix)
-		} else {
+		if (prefix == null) {
 			walkBatch(0)
+		} else {
+			setPrefix(prefix)
+			walkBatch(prefix.length)
 		}
 	}
 

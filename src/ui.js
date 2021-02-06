@@ -71,10 +71,7 @@
 
 		return {
 			language,
-			options: {
-				count: 'max',
-			},
-            fudge: Number(this.elements.fudgeStart.value),
+			fudge: Number(this.elements.fudgeStart.value),
 			prefix: null,
 			startStrings,
 			prefixLength: Number(this.elements.prefixLength.value),

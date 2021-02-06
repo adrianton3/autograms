@@ -4,17 +4,11 @@
 #include <functional>
 #include <iostream>
 #include <chrono>
-#include <thread>
-#include <mutex>
 
 const auto start = std::chrono::system_clock::now();
 
-std::mutex outputMutex;
-
 template<typename T>
 void outputComplete (const T& solution) {
-    std::scoped_lock lock { outputMutex };
-
     const auto end = std::chrono::system_clock::now();
 
     for (const auto& count : solution) {
@@ -45,31 +39,7 @@ void outputPartial (const T& partial) {
 
 /*$partial*/
 
-std::vector<std::thread> threads;
-
-int partialIndex;
-
-std::mutex pickMutex;
-
-void pick () {
-    while (true) {
-        {
-            std::scoped_lock lock { pickMutex };
-
-            if (partialIndex >= partials.size()) {
-                return;
-            }
-
-            partialIndex++;
-        }
-
-        if (partialIndex < partials.size()) {
-            runBrute(partials[partialIndex - 1].prefix);
-        }
-    }
-}
-
-void distribute (int threadCount) {
+void distribute () {
     std::sort(partials.begin(), partials.end(), [] (const auto& a, const auto& b) {
         const auto deltaMax = a.max - b.max;
 
@@ -91,22 +61,14 @@ void distribute (int threadCount) {
         return true;
     });
 
-    partialIndex = 0;
-
-    for (auto i = 1; i < threadCount; i++) {
-        threads.push_back(std::thread { pick });
-    }
-
-    pick();
-
-    for (auto& thread : threads) {
-        thread.join();
+    for (const auto& partial : partials) {
+        runBrute(partial.prefix);
     }
 }
 
 
 int main () {
 	runPartial();
-	distribute(/*$threadCount*/);
+	distribute();
 	return 0;
 }

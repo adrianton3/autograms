@@ -11,13 +11,13 @@ function makeLinesAccumulator () {
 	}
 }
 
-function generateCommon (alphabet, numerals, options, startStrings, fudge) {
+function generateCommon (alphabet, numerals, startStrings, fudge) {
 	const { push, stringify } = makeLinesAccumulator()
 
 	const {
 		signatures,
 		countStartMin,
-	} = prepare(alphabet, numerals, options, startStrings, fudge)
+	} = prepare(alphabet, numerals, startStrings, fudge)
 
 	push(`constexpr std::array<std::array<int, ${signatures[0].length}>, ${signatures.length}> signatures {{`)
 
@@ -30,14 +30,14 @@ function generateCommon (alphabet, numerals, options, startStrings, fudge) {
 	return stringify()
 }
 
-function generateBrute (alphabet, numerals, options, startStrings, fudge) {
+function generateBrute (alphabet, numerals, startStrings, fudge) {
 	const { push, stringify } = makeLinesAccumulator()
 
 	const {
 		letters,
 		countStartRest,
 		spanForIndex,
-	} = prepare(alphabet, numerals, options, startStrings, fudge)
+	} = prepare(alphabet, numerals, startStrings, fudge)
 
 	const indexMax = letters.length
 	const maxMax = numerals.length - 1
@@ -73,10 +73,12 @@ function generateBrute (alphabet, numerals, options, startStrings, fudge) {
 		`				min = 1;`,
 		`			}`,
 		``,
+		// `				sum[index]++;`, // moving this out somehow makes it slower
 		`			for (auto i = min; i <= max; i++) {`,
-		`				// apply partial`,
 		`				solution[index] = i;`,
 		`				const auto& signature = signatures[i];`,
+		``,
+		`				// apply partial`,
 		`				for (auto j = 0; j < ${indexMax}; j++) {`,
 		`					sum[j] += signature[j];`,
 		`				}`,
@@ -102,9 +104,9 @@ function generateBrute (alphabet, numerals, options, startStrings, fudge) {
 		`					sum[j] -= signature[j];`,
 		`				}`,
 		``,
-		`				// remove itself`,
 		`				sum[index]--;`,
 		`			}`,
+		// `				sum[index]--;`, // moving this out somehow makes it slower
 		`		} else {`,
 		`			const auto min = sum[index];`,
 		`			const auto max = std::min(min + spanForIndex[index], ${maxMax});`,
@@ -191,10 +193,10 @@ function generateBrute (alphabet, numerals, options, startStrings, fudge) {
 	return stringify()
 }
 
-function generatePartial (alphabet, numerals, options, startStrings, fudge) {
+function generatePartial (alphabet, numerals, startStrings, fudge) {
 	const { push, stringify } = makeLinesAccumulator()
 
-	const {	spanForIndex } = prepare(alphabet, numerals, options, startStrings, fudge)
+	const {	spanForIndex } = prepare(alphabet, numerals, startStrings, fudge)
 
 	const maxMax = numerals.length - 1
 
@@ -216,9 +218,10 @@ function generatePartial (alphabet, numerals, options, startStrings, fudge) {
 		`			const auto max = std::min(min + spanForIndex[index], ${maxMax});`,
 		``,
 		`			for (auto i = min; i <= max; i++) {`,
-		`				// apply partial`,
 		`				solution[index] = i;`,
 		`				const auto& signature = signatures[i];`,
+		``,
+		`				// apply partial`,
 		`				for (auto j = 0; j < prefixLength; j++) {`,
 		`					sum[j] += signature[j];`,
 		`				}`,
@@ -258,7 +261,40 @@ function generatePartial (alphabet, numerals, options, startStrings, fudge) {
 		``,
 		`			for (auto i = min; i <= max; i++) {`,
 		`				solution[index] = i;`,
-		`				outputPartial(solution);`,
+		`				const auto& signature = signatures[i];`,
+		``,
+		`				// apply partial`,
+		`				for (auto j = 0; j < prefixLength; j++) {`,
+		`					sum[j] += signature[j];`,
+		`				}`,
+		``,
+		`				// apply itself`,
+		`				if (i > 0) {`,
+		`					sum[index]++;`,
+		`				}`,
+		``,
+		`				// validate partial`,
+		`				bool partial = true;`,
+		`				for (auto j = 0; j <= index; j++) {`,
+		`					if (sum[j] > solution[j]) {`,
+		`						partial = false;`,
+		`						break;`,
+		`					}`,
+		`				}`,
+		``,
+		`				if (partial) {`,
+		`					outputPartial(solution);`,
+		`				}`,
+		``,
+		`				// remove partial`,
+		`				for (auto j = 0; j < prefixLength; j++) {`,
+		`					sum[j] -= signature[j];`,
+		`				}`,
+		``,
+		`				// remove itself`,
+		`				if (i > 0) {`,
+		`					sum[index]--;`,
+		`				}`,
 		`			}`,
 		`		}`,
 		`	};`,

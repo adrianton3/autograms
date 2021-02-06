@@ -7,11 +7,10 @@
 		auto.runner.runBrute(
 			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
-			parameters.options,
 			parameters.startStrings,
 			parameters.fudge,
 			parameters.prefix,
-			(type, data) => { messages.push({ type, data }) },
+			(data) => { messages.push(data.count) },
 		)
 
 		return messages
@@ -20,20 +19,19 @@
 	function reflexicon (language, prefix, fudge, expected) {
 		return {
 			input: {
-				language: 'italian',
-				options: { count: 'max' },
+				language,
 				startStrings: [''],
 				fudge,
 				prefix,
 			},
-			expected: [{ type: 'solution', data: expected }],
+			expected: [expected],
 		}
 	}
 
 	[
-		reflexicon('italian', [0, 0, 0], 6, '0 0 0 0 0 0 3 3 0 0 7 0 7'),
-		reflexicon('italian', [3, 4, 5], 6, '3 4 5 4 2 8 6 3 0 3 8 6 12'),
-		reflexicon('italian', [7, 5, 6], 6, '7 5 6 5 5 2 3 3 0 0 12 10 5'),
+		reflexicon('italian', [0, 0, 0], 6, '0 0 0 3 0 0 0 3 0 0 0 7 7'),
+		reflexicon('italian', [4, 3, 5], 6, '4 3 5 3 4 0 8 6 3 2 6 8 12'),
+		reflexicon('italian', [5, 7, 6], 6, '5 7 6 3 5 0 2 3 0 5 10 12 5'),
 	].forEach(({ input, expected }) => {
 		const actual = run(input)
 

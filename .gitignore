@@ -1,4 +1,4 @@
 .idea
 .vscode
-a
+a.out
 runner.cpp

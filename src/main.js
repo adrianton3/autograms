@@ -131,7 +131,6 @@
 		auto.runner.getInfo(
 			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
-			parameters.options,
 			parameters.startStrings,
 			parameters.fudge,
 			parameters.prefix,
@@ -141,17 +140,10 @@
 		auto.runner.runPartial(
 			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
-			parameters.options,
 			parameters.startStrings,
 			parameters.fudge,
 			parameters.prefixLength,
-			(type, data) => {
-				if (type === 'partial') {
-					partials.push(data)
-				} else {
-					output(type, data)
-				}
-			}
+			(prefix) => { partials.push(prefix) }
 		)
 
 		partials.sort((a, b) => {
@@ -197,7 +189,6 @@
 		auto.runner.getInfo(
 			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
-			parameters.options,
 			parameters.startStrings,
 			parameters.fudge,
 			parameters.prefix,
