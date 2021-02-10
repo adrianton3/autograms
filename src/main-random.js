@@ -21,12 +21,7 @@
 			console.log(data)
 			outSolutionsElement.value += `solution:\n${data}\n`
 		} else if (type === 'status') {
-			outStatusElement.value = data.map(
-				(status, index) =>
-					status.state === 'busy'
-						? `thread ${index}: ${status.state} [${status.prefix.join(' ')}]`
-						: `thread ${index}: ${status.state}`
-			).join('\n')
+			outStatusElement.value = data.map((status, index) => `thread ${index}: ${status.state}`).join('\n')
 		}
 	}
 
@@ -50,9 +45,6 @@
 
 		const optionAutogram = document.getElementById('option-autogram').checked
 
-		const countMax = document.getElementById('count-max').checked
-		const countAverage = document.getElementById('count-average').checked
-
 		const startStrings = (() => {
 			if (optionAutogram) {
 				return auto.languages[language].intros.flatMap((intro) =>
@@ -67,9 +59,6 @@
 
 		return {
 			language,
-			options: {
-				count: countMax ? 'max' : countAverage ? 'average' : 'median',
-			},
 			triesMax,
 			prefix: null,
 			startStrings,
@@ -145,7 +134,6 @@
 		auto.runner.getInfo(
 			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
-			parameters.options,
 			parameters.startStrings,
 			1000,
 			parameters.prefix,
@@ -155,18 +143,10 @@
 		auto.runner.runPartial(
 			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
-			parameters.options,
 			parameters.startStrings,
 			1000,
-			2,
-			(type, data) => {
-				// output('log', data.join(' '))
-				if (type === 'partial') {
-					partials.push(data)
-				} else {
-					output(type, data)
-				}
-			}
+			3,
+			(prefix) => { partials.push(prefix) }
 		)
 
 		partialsCountElement.textContent = `${partials.length}`
@@ -194,7 +174,6 @@
 		auto.runner.getInfo(
 			auto.languages[parameters.language].alphabet,
 			auto.languages[parameters.language].numerals,
-			parameters.options,
 			parameters.startStrings,
 			1000,
 			parameters.prefix,

@@ -196,13 +196,26 @@
 		})
 	}
 
-	function sortLetters (letters, countMax) {
-		return letters.map((letter, index) => ({ letter, weight: countMax[index] }))
-			.sort((a, b) => a.weight - b.weight)
+	function sortLetters (letters, { median, max, average }) {
+		return letters.map((letter, index) => ({
+				letter,
+				median: median[index],
+				max: max[index],
+				average: average[index],
+			}))
+			.sort((a, b) => {
+				const deltaMedian = a.median - b.median
+				if (deltaMedian !== 0) { return deltaMedian }
+
+				const deltaMax = a.max - b.max
+				if (deltaMax !== 0) { return deltaMax }
+
+				return a.average - b.average
+			})
 			.map(({ letter }) => letter)
 	}
 
-	function prepare (alphabet, numerals, options, startStringsRaw, fudge) {
+	function prepare (alphabet, numerals, startStringsRaw, fudge) {
 		const lettersRaw = getLettersAlphabetic(numerals)
 
 		const startStrings = (() => {
@@ -217,12 +230,16 @@
 		})()
 
 		const signaturesRaw = getSignatures(lettersRaw, numerals)
-		const countRaw = getCount(lettersRaw, signaturesRaw, options.count)
 
 		{
-			const letters = sortLetters(lettersRaw, countRaw)
+			const letters = sortLetters(lettersRaw, {
+				median: getCountMedian(lettersRaw, signaturesRaw),
+				max: getCountMax(lettersRaw, signaturesRaw),
+				average: getCountAverage(lettersRaw, signaturesRaw),
+			})
+
 			const signatures = getSignatures(letters, numerals)
-			const count = getCount(letters, signatures, options.count)
+			const count = getCountMax(letters, signatures)
 			const countStartMin = getCountMin(numerals, letters, startStrings)
 			const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
 			const countStartRestMax = getMax(countStartRest)
@@ -239,7 +256,7 @@
 		}
 	}
 
-	function getInfo (alphabet, numerals, _options, startStrings, fudge, prefix, output) {
+	function getInfo (alphabet, numerals, startStrings, fudge, prefix, output) {
 		output('log', `numerals ${numerals.length}`)
 
 		const letters = getLettersAlphabetic(numerals)
@@ -251,9 +268,9 @@
 		output('log', 'count start min:')
 		output('log', countStartMin.join(' '))
 
-		const preMax = prepare(alphabet, numerals, { count: 'max' }, startStrings, fudge)
+		const preMax = prepare(alphabet, numerals, startStrings, fudge)
 
-		output('log', 'sorted max:')
+		output('log', 'sorted median, max, average:')
 		output('log', preMax.letters.join(' '))
 		output('log', preMax.spanForIndex.join(' '))
 	}
