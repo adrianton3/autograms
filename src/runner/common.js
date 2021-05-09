@@ -133,6 +133,10 @@
 	}
 
 	function getCountMin (numerals, letters, startStrings) {
+		if (startStrings.length <= 0) {
+			return new Int8Array(letters.length)
+		}
+
 		const min = new Int8Array(letters.length).fill(127)
 
 		startStrings.forEach((startString) => {
@@ -149,6 +153,10 @@
 	}
 
 	function getCountRest (numerals, letters, startStrings, countStartMin) {
+		if (startStrings.length <= 0) {
+			return [new Int8Array(letters.length)]
+		}
+
 		return startStrings.map((startString) => {
 			const countNonLetters = getCountNonLetters(letters, startString)
 			const inflated = inflateNonLetters(numerals, countNonLetters, startString)
@@ -218,41 +226,32 @@
 	function prepare (alphabet, numerals, startStringsRaw, fudge) {
 		const lettersRaw = getLettersAlphabetic(numerals)
 
-		const startStrings = (() => {
-			if (startStringsRaw.length > 0 && startStringsRaw[0].length > 0) {
-				return startStringsRaw.flatMap((string) => [
-					string,
-					...generateRelated(alphabet, lettersRaw, numerals[1], string)
-				])
-			}
-
-			return startStringsRaw
-		})()
+		const startStrings = startStringsRaw.flatMap((string) =>
+			[string, ...generateRelated(alphabet, lettersRaw, numerals[1], string)]
+		)
 
 		const signaturesRaw = getSignatures(lettersRaw, numerals)
 
-		{
-			const letters = sortLetters(lettersRaw, {
-				median: getCountMedian(lettersRaw, signaturesRaw),
-				max: getCountMax(lettersRaw, signaturesRaw),
-				average: getCountAverage(lettersRaw, signaturesRaw),
-			})
+		const letters = sortLetters(lettersRaw, {
+			median: getCountMedian(lettersRaw, signaturesRaw),
+			max: getCountMax(lettersRaw, signaturesRaw),
+			average: getCountAverage(lettersRaw, signaturesRaw),
+		})
 
-			const signatures = getSignatures(letters, numerals)
-			const count = getCountMax(letters, signatures)
-			const countStartMin = getCountMin(numerals, letters, startStrings)
-			const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
-			const countStartRestMax = getMax(countStartRest)
-			const spanForIndex = getSpanForIndex(count, countStartRestMax, fudge)
+		const signatures = getSignatures(letters, numerals)
+		const count = getCountMax(letters, signatures)
+		const countStartMin = getCountMin(numerals, letters, startStrings)
+		const countStartRest = getCountRest(numerals, letters, startStrings, countStartMin)
+		const countStartRestMax = getMax(countStartRest)
+		const spanForIndex = getSpanForIndex(count, countStartRestMax, fudge)
 
-			return {
-				letters,
-				count,
-				signatures,
-				countStartMin,
-				countStartRest,
-				spanForIndex,
-			}
+		return {
+			letters,
+			count,
+			signatures,
+			countStartMin,
+			countStartRest,
+			spanForIndex,
 		}
 	}
 

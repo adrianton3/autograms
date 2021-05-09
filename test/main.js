@@ -20,7 +20,7 @@
 		return {
 			input: {
 				language,
-				startStrings: [''],
+				startStrings: [],
 				fudge,
 				prefix,
 			},
@@ -28,7 +28,9 @@
 		}
 	}
 
-	[
+	let allTestsArePassing = true
+
+	;[
 		reflexicon('italian', [0, 0, 0], 6, '0 0 0 3 0 0 0 3 0 0 0 7 7'),
 		reflexicon('italian', [4, 3, 5], 6, '4 3 5 3 4 0 8 6 3 2 6 8 12'),
 		reflexicon('italian', [5, 7, 6], 6, '5 7 6 3 5 0 2 3 0 5 10 12 5'),
@@ -39,6 +41,8 @@
 		const expectedStr = JSON.stringify(expected)
 
 		if (actualStr !== expectedStr) {
+			allTestsArePassing = false
+
 			console.error({
 				message: 'Test failed',
 				input,
@@ -47,4 +51,8 @@
 			})
 		}
 	})
+
+	if (allTestsArePassing) {
+		console.log('All tests are succesful')
+	}
 })()

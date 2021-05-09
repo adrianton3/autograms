@@ -31,7 +31,7 @@ const languages = {
 
 const parameters = {
     language: process.argv.length > 2 ? process.argv[2] : 'romanian',
-    startStrings: [''],
+    startStrings: [],
     fudge: process.argv.length > 3 ? Number(process.argv[3]) : 10,
     prefixLength: 5,
     threadCount: os.cpus().length,
