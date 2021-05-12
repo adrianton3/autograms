@@ -6,14 +6,15 @@
 		inflate,
 	} = auto.runner
 
-	function runBrute (alphabet, numerals, startStrings, fudge, prefix, output) {
+	function runBrute (alphabet, numerals, startStringsRaw, fudge, prefix, output) {
 		const {
 			letters,
 			signatures,
 			countStartMin,
 			countStartRest,
-			spanForIndex,
-		} = prepare(alphabet, numerals, startStrings, fudge)
+            spanForIndex,
+            startStrings,
+		} = prepare(alphabet, numerals, startStringsRaw, fudge)
 
 		const indexMax = letters.length
 		const maxMax = numerals.length - 1
@@ -95,7 +96,7 @@
 						if (valid && solution.some(Boolean)) {
 							output({
 								count: solution.join(' '),
-								inflated: inflate(alphabet, letters, solution, numerals),
+								inflated: inflate(alphabet, letters, solution, numerals, startStrings.length <= 0 ? null : startStrings[j]),
 							})
 						}
 					}
@@ -129,13 +130,13 @@
 		}
 	}
 
-	function runPartial (alphabet, numerals, startStrings, fudge, indexMax, output) {
+	function runPartial (alphabet, numerals, startStringsRaw, fudge, indexMax, output) {
 		const {
 			letters,
 			signatures,
 			countStartMin,
 			spanForIndex,
-		} = prepare(alphabet, numerals, startStrings, fudge)
+		} = prepare(alphabet, numerals, startStringsRaw, fudge)
 
 		const maxMax = numerals.length - 1
 
