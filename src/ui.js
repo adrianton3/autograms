@@ -61,7 +61,7 @@
 			if (this.elements.optionAutogram.checked) {
 				return auto.languages[language].intros.flatMap((intro) =>
 					auto.languages[language].lastSeparators.map((lastSeparator) =>
-						`${intro} ${lastSeparator}`
+						`${intro}|${lastSeparator}`
 					)
 				)
 			}

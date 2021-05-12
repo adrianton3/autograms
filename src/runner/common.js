@@ -83,12 +83,6 @@
 		)
 	}
 
-	function getCount (letters, signatures, count) {
-		return count === 'max' ? getCountMax(letters, signatures)
-			: count === 'average' ? getCountAverage(letters, signatures)
-			: getCountMedian(letters, signatures)
-	}
-
 	function getCountNonLetters (letters, string) {
 		const map = new Map
 
@@ -99,7 +93,7 @@
 			) {
 				map.set(
 					char,
-					map.has(char) ? map.get(char) : 1
+					map.has(char) ? map.get(char) + 1 : 1
 				)
 			}
 		})
@@ -107,15 +101,15 @@
 		return map
 	}
 
-	function inflateNonLetters (numerals, countNonLetters, string) {
-		const parts = [string]
+	function inflateNonLetters (numerals, countNonLetters) {
+		const parts = []
 
 		countNonLetters.forEach((value, key) => {
 			const numeral = numerals[value + 1]
 			parts.push(numeral.replace(/@/g, key))
 		})
 
-		return parts.join(' ')
+		return parts.join(', ')
 	}
 
 	function getCountLetters (letters, string) {
@@ -132,6 +126,11 @@
 		return count
 	}
 
+	function trimOnes (startString) {
+		const [intro, lastSeparator] = startString.split('|')
+		return `${intro} ${lastSeparator}`
+	}
+
 	function getCountMin (numerals, letters, startStrings) {
 		if (startStrings.length <= 0) {
 			return new Int8Array(letters.length)
@@ -140,9 +139,9 @@
 		const min = new Int8Array(letters.length).fill(127)
 
 		startStrings.forEach((startString) => {
-			const countNonLetters = getCountNonLetters(letters, startString)
-			const inflated = inflateNonLetters(numerals, countNonLetters, startString)
-			const countLetters = getCountLetters(letters, inflated)
+			const countNonLetters = getCountNonLetters(letters, trimOnes(startString))
+			const inflated = inflateNonLetters(numerals, countNonLetters)
+			const countLetters = getCountLetters(letters, `${startString} ${inflated}`)
 
 			letters.forEach((letter, index) => {
 				min[index] = Math.min(min[index], countLetters[index])
@@ -158,9 +157,9 @@
 		}
 
 		return startStrings.map((startString) => {
-			const countNonLetters = getCountNonLetters(letters, startString)
-			const inflated = inflateNonLetters(numerals, countNonLetters, startString)
-			const countLetters = getCountLetters(letters, inflated)
+			const countNonLetters = getCountNonLetters(letters, trimOnes(startString))
+			const inflated = inflateNonLetters(numerals, countNonLetters)
+			const countLetters = getCountLetters(letters, `${startString} ${inflated}`)
 
 			return new Int8Array(countLetters.map((value, index) => value - countStartMin[index]))
 		})
@@ -200,7 +199,7 @@
 			const freeSuffix = freeNonLetters.slice(0, index + 1)
 				.map((freeNonLetter) => numeralOne.replace('@', freeNonLetter))
 
-			return `${string} ${freeSuffix.join(' ')}`
+			return `${string}|${freeSuffix.join(', ')}`
 		})
 	}
 
@@ -252,6 +251,7 @@
 			countStartMin,
 			countStartRest,
 			spanForIndex,
+			startStrings,
 		}
 	}
 
@@ -274,14 +274,34 @@
 		output('log', preMax.spanForIndex.join(' '))
 	}
 
-	function inflate (alphabet, letters, count, numerals) {
-		return [...alphabet].filter((letter) => letters.includes(letter))
+	function inflate (alphabet, letters, count, numerals, startString) {
+		const parts = [...alphabet].filter((letter) => letters.includes(letter))
 			.map((letter) => {
 				const index = letters.indexOf(letter)
 				return numerals[count[index]].replace(/@/g, letter)
 			})
 			.filter((element) => element.length > 0)
-			.join(', ')
+
+		if (startString == null) {
+			return parts.join(', ')
+		}
+
+		const partLast = parts.pop()
+
+		const [intro, lastSeparator, ones] = startString.split('|')
+
+		if (ones) {
+			parts.push(ones)
+		}
+
+		const countNonLetters = getCountNonLetters(letters, `${intro} ${lastSeparator}`)
+		const inflatedNonLetters = inflateNonLetters(numerals, countNonLetters, `${intro} ${lastSeparator}`)
+
+		if (inflateNonLetters) {
+			parts.push(inflatedNonLetters)
+		}
+
+		return `${intro} ${parts.join(', ')} ${lastSeparator} ${partLast}.`
 	}
 
 	if (typeof window === 'undefined' && typeof WorkerGlobalScope === 'undefined') {
