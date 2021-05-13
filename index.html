@@ -12,6 +12,10 @@
             padding: 2px;
         }
 
+		.section-header {
+			padding-top: 24px;
+		}
+
         textarea {
             width: 500px;
         }
@@ -62,7 +66,7 @@
     </div>
 
     <div>
-        <label for="thread-count-max">Thread count max</label> <input id="thread-count-max" type="number" value="2" min="1" max="32">
+        <label for="thread-count-max" title="Number of active threads in the thread pool">Thread count max</label> <input id="thread-count-max" type="number" value="2" min="1" max="32">
         <label for="fudge-time-min" title="Increase fudge until iteration exceeds this amount of time">Min time (s)</label> <input id="fudge-time-min" type="number" value="30" min="0" max="3600">
     </div>
 
@@ -72,13 +76,13 @@
         Partial <span id="partials-index">-</span>/<span id="partials-count">-</span> Estimated time<span id="estimated-time">-</span>
     </div>
 
-    <div><label for="out-log">Output</label></div>
+    <div class="section-header"><label for="out-log">Output</label></div>
     <div><textarea id="out-log"></textarea></div>
 
-    <div><label for="out-solutions">Solutions</label></div>
+    <div class="section-header"><label for="out-solutions">Solutions</label></div>
     <div><textarea id="out-solutions"></textarea></div>
 
-    <div><label for="out-status">Status</label></div>
+    <div class="section-header"><label for="out-status">Status</label></div>
     <div><textarea id="out-status"></textarea></div>
 
     <script>window.auto = {}</script>

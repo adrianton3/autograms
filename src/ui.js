@@ -152,7 +152,7 @@
     }
 
     Ui.prototype.postSolution = function (count, inflated, deltaTime) {
-        this.elements.outSolutions.value += `solution: ${count}\ntime: ${stringifyTime(deltaTime)}\n"${inflated}"\n\n`
+        this.elements.outSolutions.value += `solution\n${count}\ntime: ${stringifyTime(deltaTime)}\n"${inflated}"\n\n`
     }
 
     Ui.prototype.postThreads = function (threads) {

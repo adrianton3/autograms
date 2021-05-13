@@ -4,6 +4,7 @@
 	const {
 		prepare,
 		inflate,
+		stringifyArray,
 	} = auto.runner
 
 	function runBrute (alphabet, numerals, startStringsRaw, fudge, prefix, output) {
@@ -95,7 +96,7 @@
 
 						if (valid && solution.some(Boolean)) {
 							output({
-								count: solution.join(' '),
+								count: stringifyArray(solution),
 								inflated: inflate(alphabet, letters, solution, numerals, startStrings.length <= 0 ? null : startStrings[j]),
 							})
 						}
