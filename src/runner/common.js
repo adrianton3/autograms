@@ -255,23 +255,28 @@
 		}
 	}
 
+	function stringifyArray (array) {
+		return [...array].map((element) => element.toString().padStart(3, ' '))
+			.join(' ')
+	}
+
 	function getInfo (alphabet, numerals, startStrings, fudge, prefix, output) {
-		output('log', `numerals ${numerals.length}`)
+		output('log', `numeral count: ${numerals.length}`)
 
 		const letters = getLettersAlphabetic(numerals)
-		output('log', 'letters:')
-		output('log', letters.join(' '))
+		output('log', 'letters sorted alphabetically:')
+		output('log', stringifyArray(letters))
 
 		const countStartMin = getCountMin(numerals, letters, startStrings)
 
 		output('log', 'count start min:')
-		output('log', countStartMin.join(' '))
+		output('log', stringifyArray(countStartMin))
 
 		const preMax = prepare(alphabet, numerals, startStrings, fudge)
 
 		output('log', 'sorted median, max, average:')
-		output('log', preMax.letters.join(' '))
-		output('log', preMax.spanForIndex.join(' '))
+		output('log', stringifyArray(preMax.letters))
+		output('log', stringifyArray(preMax.spanForIndex))
 	}
 
 	function inflate (alphabet, letters, count, numerals, startString) {
@@ -309,6 +314,7 @@
 			getInfo,
 			prepare,
 			inflate,
+			stringifyArray,
 		})
 	} else {
 		auto.runner = auto.runner || {}
@@ -316,6 +322,7 @@
 			getInfo,
 			prepare,
 			inflate,
+			stringifyArray,
 		})
 	}
 })()
