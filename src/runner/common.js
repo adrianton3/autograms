@@ -260,7 +260,7 @@
 			.join(' ')
 	}
 
-	function getInfo (alphabet, numerals, startStrings, fudge, prefix, output) {
+	function getInfo (alphabet, numerals, startStrings, fudge, output) {
 		output('log', `numeral count: ${numerals.length}`)
 
 		const letters = getLettersAlphabetic(numerals)
@@ -274,8 +274,10 @@
 
 		const preMax = prepare(alphabet, numerals, startStrings, fudge)
 
-		output('log', 'sorted median, max, average:')
+		output('log', 'sorted by median, max, average:')
 		output('log', stringifyArray(preMax.letters))
+
+		output('log', 'branching factor:')
 		output('log', stringifyArray(preMax.spanForIndex))
 	}
 

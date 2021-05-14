@@ -3,6 +3,7 @@
 
 	const ui = new auto.Ui({
 		languages: auto.languages,
+		threadCountMax: navigator.hardwareConcurrency,
 		handleFudgeTimeChange,
 		handleThreadCountChange,
 		handleRun,
@@ -133,7 +134,6 @@
 			auto.languages[parameters.language].numerals,
 			parameters.startStrings,
 			parameters.fudge,
-			parameters.prefix,
 			output,
 		)
 
@@ -191,7 +191,6 @@
 			auto.languages[parameters.language].numerals,
 			parameters.startStrings,
 			parameters.fudge,
-			parameters.prefix,
 			output,
 		)
 	}
