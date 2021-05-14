@@ -24,7 +24,8 @@
             options.handleFudgeTimeChange(Number(elements.fudgeTimeMin.value) * 1000)
         })
 
-        elements.threadCountMax = document.getElementById('thread-count-max')
+		elements.threadCountMax = document.getElementById('thread-count-max')
+		elements.threadCountMax.value = options.threadCountMax
         elements.threadCountMax.addEventListener('change', () => {
             options.handleThreadCountChange(Number(elements.threadCountMax.value))
         })
