@@ -57,8 +57,8 @@
         <input type="radio" id="option-reflexicon" name="option"><label for="option-reflexicon">Reflexicon</label>
     </div>
 
-    <div>
-        <label for="prefix-length">Prefix length</label> <input id="prefix-length" type="number" value="4" min="1" max="5">
+    <div hidden>
+        <label for="prefix-length">Prefix length</label> <input id="prefix-length" type="number" value="4" min="1" max="4">
     </div>
 
     <div>
@@ -83,7 +83,12 @@
     <div><textarea id="out-solutions" readonly></textarea></div>
 
     <div class="section-header"><label for="out-status">Status</label></div>
-    <div><textarea id="out-status" readonly></textarea></div>
+	<div><textarea id="out-status" readonly></textarea></div>
+
+	<br>
+	<br>
+	<br>
+	<a href="https://github.com/adrianton3/autograms">Source code and details</a>
 
     <script>window.auto = {}</script>
 
