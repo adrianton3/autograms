@@ -20,7 +20,7 @@
 			// 'Fraza următoare este alcătuită din',
 			// 'Fraza următoare este formată din',
 
-			'Această frază conține',
+			// 'Această frază conține',
 			// 'Această frază are',
 			// 'Această frază include',
 			// 'Această frază cuprinde',
@@ -30,7 +30,7 @@
 
 			// 'Fraza aceasta conține',
 			// 'Fraza aceasta are',
-			// 'Fraza aceasta include',
+			'Fraza aceasta include',
 			// 'Fraza aceasta cuprinde',
 			// 'Fraza aceasta înglobează',
 			// 'Fraza aceasta este alcătuită din',
