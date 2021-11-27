@@ -22,6 +22,14 @@ Numeral signatures, search spans and other data used to direct the search is com
 as in the web version (this time using node) and from this a cpp file is generated which is then fed to a c++ compiler. The same data could be obtained entirely at compile-time in c++ with `constexpr` and friends but the
 JavaScript logic was already tried and tested and works just fine.
 
+### Web benchmark
+
+There is also a more static page that just logs the time it takes to find the Romanian reflexicon.
+This is used only for benchmarking reasons. Romanian was chosen as its first reflexicon is harder
+to find than the ones in the other available languages.
+
+https://adrianton3.github.io/autograms/bench.html
+
 ### Autograms found by this project
 
 #### Latin reflexicon

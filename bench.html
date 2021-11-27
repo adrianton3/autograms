@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Autograms benchmark</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            font-size: x-large;
+        }
+    </style>
+</head>
+<body style="padding-top: 64px;">
+    <div><button id="run" style="width: 560px; height: 64px; font-size: large;">Benchmark</button></div>
+    <div hidden><span id="wait">running benchmark; this may take from a few seconds up to a few minutes</span></div>
+    <div id="result" hidden>
+        <div><span>Time</span></div>
+        <div><span id="result-ms"></span></div>
+        <div><span id="result-pretty"></span></div>
+    </div>
+    <div style="margin-top: 96px;">
+        <span style="display: inline-block; width: 560px; text-align: justify; font-size: small;">
+            The benchmark consists of finding the first reflexicon in Romanian.<br>
+            The first reflexicon in Romanian is harder to find than the ones in English, French, Italian or Latin.<br>
+            This is a long-running benchmark and may take up to a few minutes.<br>
+            It will use all available cores.
+            Read more at <a href="https://github.com/adrianton3/autograms" target="_blank">https://github.com/adrianton3/autograms</a>
+        </span>
+    </div>
+
+    <script>window.auto = {}</script>
+
+    <script src="languages/italian.js"></script>
+    <script src="languages/romanian.js"></script>
+    <script src="languages/latin.js"></script>
+    <script src="languages/english.js"></script>
+    <script src="languages/french.js"></script>
+
+    <script src="src/worker-pool.js"></script>
+    <script src="src/runner/common.js"></script>
+    <script src="src/runner/brute.js"></script>
+
+    <script src="src/ui.js"></script>
+
+    <script>
+        (() => {
+            'use strict'
+
+            const pool = auto.makePool(navigator.hardwareConcurrency, handleMessage)
+
+            const parameters = {
+                language: 'romanian',
+                startStrings: [],
+                fudge: 11,
+                prefixLength: 4,
+            }
+
+            let partials = []
+            let partialsIndex = 0
+
+            let startTime = 0
+
+            function postPartial () {
+                if (partialsIndex >= partials.length) {
+                    return
+                }
+
+                pool.post({
+                    type: 'solve',
+                    parameters: {
+                        language: parameters.language,
+                        startStrings: parameters.startStrings,
+                        fudge: parameters.fudge,
+                        prefix: partials[partialsIndex],
+                    },
+                })
+
+                partialsIndex++
+            }
+
+            function handleMessage (message) {
+                if (message.type === 'end') {
+                    postPartial()
+                } else if (message.type === 'solution') {
+                    pool.terminate()
+
+                    const deltaTime = performance.now() - startTime
+
+                    console.log(message.data.count)
+                    console.log(message.data.inflated)
+                    console.log(deltaTime)
+                    console.log(auto.stringifyTime(deltaTime))
+
+                    setTimeout(() => {
+                        document.getElementById('wait').parentElement.hidden = true
+
+                        document.getElementById('result').hidden = false
+                        document.getElementById('result-ms').textContent = `${Math.ceil(deltaTime)} ms`
+                        document.getElementById('result-pretty').textContent = auto.stringifyTime(Math.ceil(deltaTime))
+                    }, deltaTime < 2000 ? 2000 - deltaTime : 4)
+		        }
+            }
+
+            function handleRun () {
+                document.getElementById('run').parentElement.hidden = true
+                document.getElementById('wait').parentElement.hidden = false
+
+                startTime = performance.now()
+
+                partials = []
+                partialsIndex = 0
+
+                auto.runner.runPartial(
+                    auto.languages[parameters.language].alphabet,
+                    auto.languages[parameters.language].numerals,
+                    parameters.startStrings,
+                    parameters.fudge,
+                    parameters.prefixLength,
+                    (prefix) => { partials.push(prefix) }
+                )
+
+                partials.sort((a, b) => {
+                    const deltaMax = Math.max(...a) - Math.max(...b)
+
+                    if (deltaMax !== 0) {
+                        return deltaMax
+                    }
+
+                    for (let i = 0; i < a.length; i++) {
+                        if (a[i] > b[i]) {
+                            return 1
+                        } else if (a[i] < b[i]) {
+                            return -1
+                        }
+                    }
+
+                    return 0
+                })
+
+                for (let i = 0; i < pool.getSize(); i++) {
+                    postPartial()
+                }
+            }
+
+            document.getElementById('run').addEventListener('click', handleRun)
+        })()
+    </script>
+</body>
+</html>
