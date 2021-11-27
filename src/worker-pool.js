@@ -84,7 +84,12 @@
             },
             setSize (newSize) {
                 size = Math.min(sizeMax, newSize)
-            }
+            },
+            terminate () {
+                workers.forEach((worker) => {
+                    worker.terminate()
+                })
+            },
         }
     }
 
